@@ -1,0 +1,18 @@
+1280*1024*24
+
+RGB 3byte
+
+struct RGB;
+
+bitmap
+FILE_HEADER
+INFO_HEADER
+[]
+32 RGBA
+24bit bitmap
+mspaint
+微软绘图
+
+*.bmp -> hdb
+
+

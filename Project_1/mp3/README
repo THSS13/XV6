@@ -1,0 +1,10 @@
+XV6 mp3 player Project  Version 1.0 01/23/2015
+
+INTRODUCTION
+--------------------
+
+/Decoder_VS: provides a library-independent implementation of mp3 decoding. The code can be compiled and executed under VS 2012 in Windows or gcc in Linux. The executable converted an mp3 file into raw audio data of pcm format, which can be loaded directly be audio devices.
+
+/XV6: an imcomplete version of mp3 player implementation under framework of xv6. By commenting line 12 in play.c, the code is able to read and play the pre-decoded pcm file.
+
+/report.pdf: final report for the project.
