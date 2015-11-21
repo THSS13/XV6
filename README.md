@@ -35,5 +35,5 @@ https://github.com/mit-pdos/xv6-public
 
 
 ## 任务清单（定时更新）
-1. 在第十周（11月22日）前将往届的Project2在自己的电脑上跑起来。
+1. 在第十周（11月22日）前将往届的Project2在自己的电脑上跑起来。(跑步起来的可以看一下[Issue#7](https://github.com/THSS13/XV6/issues/7))
 2. 在第十二周（12月6日）前搞定内核升级以及代码整合（需求中的1和2）。
