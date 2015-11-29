@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
 		exit();
 	}
 	//存放文件内容
+	
 	char *text[MAX_LINE_NUMBER] = {};
 	text[0] = malloc(MAX_LINE_LENGTH);
 	memset(text[0], 0, MAX_LINE_LENGTH);
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
 	//如果文件存在，则打开并读取里面的内容
 	if (fd != -1)
 	{
+		printf(1, "file exist\n");
 		char buf[BUF_SIZE] = {};
 		int len = 0;
 		while ((len = read(fd, buf, BUF_SIZE)) > 0)
@@ -78,6 +80,9 @@ int main(int argc, char *argv[])
 				break;
 		}
 		close(fd);
+	} else{
+		printf(1,"File do not exist\n");
+		exit();
 	}
 	
 	//输出文件内容
@@ -183,6 +188,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	//setProgramStatus(SHELL);
+	
 	exit();
 }
 
