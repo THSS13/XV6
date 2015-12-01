@@ -7,6 +7,13 @@ xv6最新原码地址：https://github.com/mit-pdos/xv6-public
 
 -----
 
+小组分工：
+1. MP3（徐京傲组、马希鹏组、高贤达组）
+2. GUI（夏英达组、陈彤宇组、竺俊超组）
+3. Shell（柯豪组、洪政佑组）
+
+-----
+
 ## 申请加入
 1. 点击[Issues#1](https://github.com/THSS13/XV6/issues/1)
 -  按照要求回复
@@ -37,6 +44,6 @@ xv6最新原码地址：https://github.com/mit-pdos/xv6-public
   
 
 
-## 任务清单（定时更新）
+## 任务清单（不定时更新）
 1. 在第十周（11月22日）前将往届的Project2在自己的电脑上跑起来。(跑不起来的可以看一下[Issue#7](https://github.com/THSS13/XV6/issues/7))
-2. 在第十二周（12月6日）前搞定内核升级以及代码整合（需求中的1和2）。
+2. 在某一周前搞定代码整合（需求中的1和2）。
