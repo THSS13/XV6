@@ -36,7 +36,7 @@ OBJS = \
 	vesamode.o\
 
 # Cross-compiling (e.g., on Mac OS X)
-# TOOLPREFIX = i386-jos-elf
+TOOLPREFIX = i386-jos-elf
 
 # Using native tools (e.g., on X86 Linux)
 #TOOLPREFIX = 
@@ -76,11 +76,11 @@ QEMU = $(shell if which qemu > /dev/null; \
 	echo "***" 1>&2; exit 1)
 endif
 
-CC = $(TOOLPREFIX)gcc
-AS = $(TOOLPREFIX)gas
-LD = $(TOOLPREFIX)ld
-OBJCOPY = $(TOOLPREFIX)objcopy
-OBJDUMP = $(TOOLPREFIX)objdump
+CC = gcc
+AS = /Users/JayGuy/.oh-my-zsh/plugins/gas
+LD = ld
+OBJCOPY =  /usr/local/Cellar/binutils/2.25.1/bin/gobjcopy
+OBJDUMP =  /usr/local/Cellar/binutils/2.25.1/bin/gobjdump
 #CFLAGS = -fno-pic -static -fno-builtin -fno-strict-aliasing -O2 -Wall -MD -ggdb -m32 -Werror -fno-omit-frame-pointer
 CFLAGS = -fno-pic -static -fno-builtin -fno-strict-aliasing -fvar-tracking -fvar-tracking-assignments -O0 -Wall -MD -gdwarf-2 -m32 -Werror -fno-omit-frame-pointer
 CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
