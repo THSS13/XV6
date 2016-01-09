@@ -1,0 +1,15 @@
+#include "types.h"
+#include "stat.h"
+#include "user.h"
+#include "math.h"
+#include "common.h"
+#include "decode.h"
+#include "huffman.h"
+
+void decode_info(Bit_stream_struc *bs, struct frame_params *fr_ps)
+{
+    layer *hdr = fr_ps->header;
+
+    hdr->version = get1bit(bs);
+    hdr->lay = 4-getbits(bs,2);
+    hdr->error_protection = !get1bit(bs); /* 
