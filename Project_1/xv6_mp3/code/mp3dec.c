@@ -23,57 +23,6 @@ int bitsGet1;
 int needRewind;
 int bitsGet2;
 
-// void output_frps2(struct frame_params *fr_ps)
-// {
-//     printf(0, "version=%d ", fr_ps->header->version);
-//     printf(0, "lay=%d ", fr_ps->header->lay);
-//     printf(0, "error_protection=%d ", fr_ps->header->error_protection);
-//     printf(0, "bitrate_index=%d ", fr_ps->header->bitrate_index);
-//     printf(0, "sampling_frequency=%d ", fr_ps->header->sampling_frequency);
-//     printf(0, "padding=%d ", fr_ps->header->padding);
-//     printf(0, "extension=%d ", fr_ps->header->extension);
-//     printf(0, "mode=%d ", fr_ps->header->mode);
-//     printf(0, "mode_ext=%d ", fr_ps->header->mode_ext);
-//     printf(0, "copyright=%d ", fr_ps->header->copyright);
-//     printf(0, "original=%d ", fr_ps->header->original);
-//     printf(0, "emphasis=%d ", fr_ps->header->emphasis);
-// 	printf(0, "actual_mode=%d ", fr_ps->actual_mode);
-// 	printf(0, "stereo=%d ", fr_ps->stereo);
-// 	printf(0, "jsbound=%d ", fr_ps->jsbound);
-// 	printf(0, "sblimit=%d\n", fr_ps->sblimit);
-// }
-
-// void output_side_info2(struct III_side_info_t *si)
-// {
-// 	printf(0, "main_data_begin=%d\n", si->main_data_begin);
-// 	printf(0, "private_bits=%d\n", si->private_bits);
-// 	int i, j;
-// 	for (i = 0; i < 2; i++) {
-// 		for (j = 0; j < 4; j++) {
-// 			printf(0, "scfsi[%d]=%d  ", j, si->ch[i].scfsi[j]);
-// 		}
-// 		printf(0, "\n");
-// 		for (j = 0; j < 2; j++) {
-// 			printf(0, "gr[%d].part2_3_length=%d  ", j, si->ch[i].gr[j].part2_3_length);
-// 			printf(0, "gr[%d].big_values=%d  ", j, si->ch[i].gr[j].big_values);
-// 			printf(0, "gr[%d].global_gain=%d  ", j, si->ch[i].gr[j].global_gain);
-// 			printf(0, "gr[%d].scalefac_compress=%d  ", j, si->ch[i].gr[j].scalefac_compress);
-// 			printf(0, "gr[%d].window_switching_flag=%d  ", j, si->ch[i].gr[j].window_switching_flag);
-// 			printf(0, "gr[%d].block_type=%d  ", j, si->ch[i].gr[j].block_type);
-// 			printf(0, "gr[%d].mixed_block_flag=%d  ", j, si->ch[i].gr[j].mixed_block_flag);
-
-// 			printf(0, "gr[%d].region0_count=%d  ", j, si->ch[i].gr[j].region0_count);
-// 			printf(0, "gr[%d].region1_count=%d  ", j, si->ch[i].gr[j].region1_count);
-// 			printf(0, "gr[%d].preflag=%d  ", j, si->ch[i].gr[j].preflag);
-// 			printf(0, "gr[%d].scalefac_scale=%d  ", j, si->ch[i].gr[j].scalefac_scale);
-// 			printf(0, "gr[%d].count1table_select=%d  ", j, si->ch[i].gr[j].count1table_select);
-// 			printf(0, "\n");
-// 		}
-// 		printf(0, "\n");
-// 	}
-// 	printf(0, "\n");
-// }
-
 uint t1, t2;
 
 int main()

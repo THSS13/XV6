@@ -22,6 +22,7 @@ Rect initRect(int x, int y, int w, int h)
 
 int isIn(Point p, Rect r)
 {
+	cprintf("%X %X\n",p.x, p.y);
 	return (p.x >= r.start.x) && (p.x < r.start.x+r.width)
 			&& (p.y >= r.start.y) && (p.y < r.start.y+r.height);
 }
@@ -111,6 +112,7 @@ void deleteClickable(Clickable **head, Rect region)
 int executeHandler(Clickable *head, Point click)
 {
 	Clickable *cur = head;
+	printf("%x\n", cur->area.start.x);
 	while (cur != 0)
 	{
 		if (isIn(click, cur->area))

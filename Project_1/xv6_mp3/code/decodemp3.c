@@ -158,67 +158,6 @@ void initialize_huffman()
 	huffman_initialized = TRUE;
 }
 
-// void output_frps2(struct frame_params *fr_ps)
-// {
-//     printf(0, "version=%d ", fr_ps->header->version);
-//     printf(0, "lay=%d ", fr_ps->header->lay);
-//     printf(0, "error_protection=%d ", fr_ps->header->error_protection);
-//     printf(0, "bitrate_index=%d ", fr_ps->header->bitrate_index);
-//     printf(0, "sampling_frequency=%d ", fr_ps->header->sampling_frequency);
-//     printf(0, "padding=%d ", fr_ps->header->padding);
-//     printf(0, "extension=%d ", fr_ps->header->extension);
-//     printf(0, "mode=%d ", fr_ps->header->mode);
-//     printf(0, "mode_ext=%d ", fr_ps->header->mode_ext);
-//     printf(0, "copyright=%d ", fr_ps->header->copyright);
-//     printf(0, "original=%d ", fr_ps->header->original);
-//     printf(0, "emphasis=%d ", fr_ps->header->emphasis);
-//     printf(0, "actual_mode=%d ", fr_ps->actual_mode);
-//     printf(0, "stereo=%d ", fr_ps->stereo);
-//     printf(0, "jsbound=%d ", fr_ps->jsbound);
-//     printf(0, "sblimit=%d\n", fr_ps->sblimit);
-// }
-
-// void output_h(struct huffcodetab *h) 
-// {
-//   printf(0, "%s ", h->tablename);
-//   printf(0, "%d ", h->xlen);
-//   printf(0, "%d ", h->ylen);
-//   printf(0, "%d ", h->linbits);
-//   printf(0, "%d ", h->linmax);
-//   printf(0, "%d ", h->ref);
-//   printf(0, "%d\n", h->treelen);
-// }
-
-// void output_side_info(struct III_side_info_t *si)
-// {
-//   int i, j;
-//   printf(0, "main_data_begin=%d\n", si->main_data_begin);
-//   printf(0, "private_bits=%d\n", si->private_bits);
-//   for (i = 0; i < 2; i++) {
-//     for (j = 0; j < 4; j++) {
-//       printf(0, "scfsi[%d]=%d  ", j, si->ch[i].scfsi[j]);
-//     }
-//     printf(0, "\n");
-//     for (j = 0; j < 2; j++) {
-//       printf(0, "gr[%d].part2_3_length=%d  ", j, si->ch[i].gr[j].part2_3_length);
-//       printf(0, "gr[%d].big_values=%d  ", j, si->ch[i].gr[j].big_values);
-//       printf(0, "gr[%d].global_gain=%d  ", j, si->ch[i].gr[j].global_gain);
-//       printf(0, "gr[%d].scalefac_compress=%d  ", j, si->ch[i].gr[j].scalefac_compress);
-//       printf(0, "gr[%d].window_switching_flag=%d  ", j, si->ch[i].gr[j].window_switching_flag);
-//       printf(0, "gr[%d].block_type=%d  ", j, si->ch[i].gr[j].block_type);
-//       printf(0, "gr[%d].mixed_block_flag=%d  ", j, si->ch[i].gr[j].mixed_block_flag);
-
-//       printf(0, "gr[%d].region0_count=%d  ", j, si->ch[i].gr[j].region0_count);
-//       printf(0, "gr[%d].region1_count=%d  ", j, si->ch[i].gr[j].region1_count);
-//       printf(0, "gr[%d].preflag=%d  ", j, si->ch[i].gr[j].preflag);
-//       printf(0, "gr[%d].scalefac_scale=%d  ", j, si->ch[i].gr[j].scalefac_scale);
-//       printf(0, "gr[%d].count1table_select=%d  ", j, si->ch[i].gr[j].count1table_select);
-//       printf(0, "\n");
-//     }
-//     printf(0, "\n");
-//   }
-//   printf(0, "\n");
-// }
 
 void III_hufman_decode(long int is[SBLIMIT][SSLIMIT], struct III_side_info_t *si, int ch, int gr, int part2_start, struct frame_params *fr_ps)
 {
@@ -229,18 +168,9 @@ void III_hufman_decode(long int is[SBLIMIT][SSLIMIT], struct III_side_info_t *si
    int region2Start;
    int bt = (*si).ch[ch].gr[gr].window_switching_flag && ((*si).ch[ch].gr[gr].block_type == 2);
 
-   // printf(0, "Now in hufman decode %d %d !\n", ch, gr);
-   // output_side_info(si);
-   // output_frps2(fr_ps);
-
    initialize_huffman();
 
-   // printf(0, "Now in hufman decode!\n");
-   // int u;
-   // for (u = 0; u < 2; u++) {
-   //    printf(0, "u:%d %d %d %d %d\n", u, ht[u].xlen, ht[u].ylen, ht[u].linbits, ht[u].linmax);
-   // }
-
+ 
    /* 查找区域边界 */
 
    if ( ((*si).ch[ch].gr[gr].window_switching_flag) &&
@@ -272,11 +202,9 @@ void III_hufman_decode(long int is[SBLIMIT][SSLIMIT], struct III_side_info_t *si
         h = &ht[(*si).ch[ch].gr[gr].table_select[1]];
       else 
         h = &ht[(*si).ch[ch].gr[gr].table_select[2]];
-      // if (i == 0) output_h(h);
-      // if (i == 0) printf(0, "%d\n", h->treelen);
+      
       huffman_decoder(h, &x, &y, &v, &w);
-      // if (i == 0) printf(0, "%d\n", h->treelen);
-      // if (i == 0) printf(0, "%d %d %d %d\n", x, y, v, w);
+    
       is[i/SSLIMIT][i%SSLIMIT] = x;
       is[(i+1)/SSLIMIT][(i+1)%SSLIMIT] = y;
     }
@@ -406,8 +334,7 @@ void III_dequantize_sample(long int is[SBLIMIT][SSLIMIT], double xr[SBLIMIT][SSL
 			sign = (is[sb][ss]<0) ? 1 : 0;
 			xr[sb][ss] *= pow( (double) abs(is[sb][ss]), ((double)4.0/3.0) );
 			if (sign) xr[sb][ss] = -xr[sb][ss];
-      // printf(0, "test point 5 in dequantize sample passed\n");
-      // printf(0, "\n");
+    
 		}
 	}
 }
