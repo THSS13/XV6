@@ -85,6 +85,7 @@ void h_newFile(Point p);
 void h_newFolder(Point p);
 void h_deleteFile(Point p);
 void h_chooseFile(Point p);
+void h_openFile(Point p);
 void h_closeWnd(Point p);
 void h_empty(Point p);
 void h_chvm2(Point p);
@@ -214,9 +215,9 @@ struct Icon contentRes[] = { { "file_icon_big.bmp", 0, 0 }, {
 void drawItem(Context context, char *name, struct stat st, Rect rect, int chosen) {
 	//cprintf("draw finder Item: type=%d counter=%d\n", type, n);
 	unsigned short nameColor;
-	if (chosen == 0) 
+	if (chosen == 0)
 		nameColor = 0x0;
-	else 
+	else
 	{
 		nameColor = 0xFFFF;
 		fill_rect(context, rect.start.x, rect.start.y, rect.width, rect.height, 0x2110);
@@ -244,7 +245,7 @@ void drawItem(Context context, char *name, struct stat st, Rect rect, int chosen
 	} else {
 		switch (st.type) {
 		case T_FILE:
-			draw_picture(context, contentRes[FILE_ICON_SMALL].pic, 
+			draw_picture(context, contentRes[FILE_ICON_SMALL].pic,
 					rect.start.x + LIST_ITEM_OFFSET_X, rect.start.y + LIST_ITEM_OFFSET_Y);
 			char *size;
 			size = sizeFormat(st.size);
@@ -264,7 +265,7 @@ void drawItem(Context context, char *name, struct stat st, Rect rect, int chosen
 char *sizeFormat(uint size){
 	char* result = (char *) malloc(12 * sizeof(char));
 	int n = 0;
-	if (size > 0x400) 
+	if (size > 0x400)
 	{
 		size = size / (0x400);
 		do{
@@ -275,7 +276,7 @@ char *sizeFormat(uint size){
 		result[n++] = 'b';
 		result[n] = 0;
 	}
-	else 
+	else
 	{
 		do{
 			result[n++] = (size % 10) + '0';
@@ -401,6 +402,7 @@ void addItemEvent(ClickableManager *cm, struct fileItem item) {
 	switch (item.st.type) {
 	case T_FILE:
 		createClickable(cm, item.pos, MSG_LPRESS, h_chooseFile);
+		createClickable(cm, item.pos, MSG_DOUBLECLICK, h_openFile);
 		break;
 	case T_DIR:
 		createClickable(cm, item.pos, MSG_LPRESS, h_chooseFile);
@@ -576,6 +578,26 @@ void h_chooseFile(Point p) {
 	drawFinderContent(context);
 }
 
+void h_openFile(Point p) {
+	struct fileItem *temp = getFileItem(p);
+	char fileName[201];
+	strcpy(fileName, temp->name);
+	int length = strlen(fileName);
+
+	if (length <= 4) {
+		return;
+	}
+
+	// if it is txt file
+	if (fileName[length-4] == '.' && fileName[length-3] == 't' && fileName[length-2] == 'x' && fileName[length-1] == 't') {
+		// do something...
+		printf(0, "txt!! %s\n", temp->name);
+	} else if (fileName[length-4] == '.' && fileName[length-3] == 'b' && fileName[length-2] == 'm' && fileName[length-1] == 'p') {
+		// do something...
+		printf(0, "bmp!! %s\n", temp->name);
+	}
+}
+
 void h_closeWnd(Point p) {
 	isRun = 0;
 }
@@ -710,4 +732,3 @@ void testHandlers() {
 //	list(".");
 //	printItemList();
 }
-
