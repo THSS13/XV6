@@ -49,6 +49,27 @@
 struct Context context;
 ClickableManager cm;
 int isRun = 1;
+
+void textEditor_init(char *fileName)
+{
+    int pid;
+    char* editor_argv[] = { "textEditor_gui", fileName};
+
+    printf(1, "init textEditor: starting editor\n");
+    pid = fork();
+    if (pid < 0)
+    {
+        printf(1, "init textEditor: fork failed\n");
+        exit();
+    }
+    if (pid == 0)
+    {
+        exec("txtEditor_gui", editor_argv);
+        printf(1, "init textEditor: exec editor failed\n");
+        exit();
+    }
+}
+
 // 文件项
 struct fileItem {
 	struct stat st;
@@ -590,7 +611,8 @@ void h_openFile(Point p) {
 
 	// if it is txt file
 	if (fileName[length-4] == '.' && fileName[length-3] == 't' && fileName[length-2] == 'x' && fileName[length-1] == 't') {
-		// do something...
+        // do something...
+		textEditor_init(fileName);
 		printf(0, "txt!! %s\n", temp->name);
 	} else if (fileName[length-4] == '.' && fileName[length-3] == 'b' && fileName[length-2] == 'm' && fileName[length-1] == 'p') {
 		// do something...
