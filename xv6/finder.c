@@ -99,7 +99,7 @@ void printItemList();
 void testHandlers();
 
 // 初始化图片浏览器
-void picViewerInit(Point point);
+void picViewerInit(Point point, char* fileName);
 
 // 文件项列表相关操作
 void addFileItem(struct stat st, char *name, Rect pos) {
@@ -596,7 +596,7 @@ void h_openFile(Point p) {
 		printf(0, "txt!! %s\n", temp->name);
 	} else if (fileName[length-4] == '.' && fileName[length-3] == 'b' && fileName[length-2] == 'm' && fileName[length-1] == 'p') {
 		printf(0, "bmp!! %s\n", temp->name);
-		picViewerInit(p);
+		picViewerInit(p, temp->name);
 	}
 }
 
@@ -638,10 +638,10 @@ void h_empty(Point p) {
 
 }
 
-void picViewerInit(Point point)
+void picViewerInit(Point point, char* fileName)
 {
     int pid;
-    char* picViewer_argv[] = { "picviewer", 0 };
+    char* picViewer_argv[] = { "picviewer", fileName };
 
     printf(1, "init picViewer: starting picViewer\n");
     pid = fork();

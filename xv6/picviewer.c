@@ -8,7 +8,102 @@ Handler wndEvents[] = {
     h_closeWnd
 };
 
+PICNODE pic;
 int isRun = 1;
+
+// 压缩图片
+void compressPic(int width, int height) {
+    int w0, h0, w1, h1;
+    float fw, fh;
+    int x0, y0, x1, x2, y1, y2;
+    float fx1, fx2, fy1, fy2;
+    int x, y, index;
+    RGBQUAD* data;
+
+    w0 = pic.width;
+    h0 = pic.height;
+    w1 = width;
+    h1 = height;
+
+    fw = w0 * 1.0 / w1;
+    fh = h0 * 1.0 / h1;
+
+    index = 0;
+    data = (RGBQUAD*)malloc(w1*h1*sizeof(RGBQUAD));
+    memset(data, 0, (uint)w1*h1*sizeof(RGBQUAD));
+    for (y = 0; y < h1; ++y) {
+        y0 = y*fh;
+        y1 = (int)y0;
+        y2 = (y1 == h0-1) ? y1 : y1 + 1;
+
+        fy1 = y1-y0;
+        fy2 = 1.0f-fy1;
+
+        for (x = 0; x < w1; ++x) {
+            x0 = x*fw;
+            x1 = (int)x0;
+            x2 = (x1 == w0-1) ? x1 : x1 + 1;
+
+            fx1 = y1-y0;
+            fx2 = 1.0f-fx1;
+
+            float s1 = fx1*fy1;
+            float s2 = fx2*fy1;
+            float s3 = fx2*fy2;
+            float s4 = fx1*fy2;
+
+            RGBQUAD p1, p2, p3, p4;
+            p1 = pic.data[x1+y1*w0];
+            p2 = pic.data[x2+y1*w0];
+            p3 = pic.data[x1+y2*w0];
+            p4 = pic.data[x2+y2*w0];
+
+            data[index].rgbRed = (BYTE)(p1.rgbRed*s3 + p2.rgbRed*s4 + p3.rgbRed*s2 + p4.rgbRed*s1);
+            data[index].rgbGreen = (BYTE)(p1.rgbGreen*s3 + p2.rgbGreen*s4 + p3.rgbGreen*s2 + p4.rgbGreen*s1);
+            data[index].rgbBlue = (BYTE)(p1.rgbBlue*s3 + p2.rgbBlue*s4 + p3.rgbBlue*s2 + p4.rgbBlue*s1);
+
+            data[index].rgbRed = p1.rgbRed;
+            data[index].rgbGreen = p1.rgbGreen;
+            data[index].rgbBlue = p1.rgbBlue;
+
+            ++index;
+        }
+    }
+
+    freepic(&pic);
+    pic.data = data;
+    pic.width = width;
+    pic.height = height;
+}
+
+void modifyPic(Context context) {
+    int c_width, c_height;
+    int pic_width, pic_height;
+
+    c_width = context.width;
+    c_height = context.height;
+    pic_width = pic.width;
+    pic_height = pic.height;
+
+    if (pic_width < c_width && pic_height < c_height) {
+        return;
+    }
+
+    float scale_p, scale_c;
+    scale_p = pic_width * 1.0 / pic_height;
+    scale_c = c_width * 1.0 / c_height;
+
+    if (scale_p <= scale_c) {
+        pic_width = scale_p * (c_height-10);
+        pic_height = c_height-10;
+    } else {
+        pic_height = (c_width-5) / scale_p;
+        pic_width = c_width-5;
+    }
+    printf(0, "modifyPic: pic_width: %d, pic_height: %d\n", pic_width, pic_height);
+
+    compressPic(pic_width, pic_height);
+}
 
 // 绘制窗口
 void drawPicViewerWnd(Context context) {
@@ -28,6 +123,19 @@ void drawPicViewerWnd(Context context) {
     puts_str(context, "PictureViewer", 0, WINDOW_WIDTH/2 - 53, 3);
 
     draw_iconlist(context, wndRes, sizeof(wndRes) / sizeof(ICON));
+}
+
+void drawPicViewerContent(Context context, char* fileName) {
+    int c_width, c_height;
+    int pic_width, pic_height;
+
+    c_width = context.width;
+    c_height = context.height;
+    pic_width = pic.width;
+    pic_height = pic.height;
+
+    printf(0, "drawPicViewerContent: pic_width: %d, pic_height: %d\n", pic_width, pic_height);
+    draw_picture(context, pic, (c_width-pic_width) >> 1, TOPBAR_HEIGHT + ((c_height-pic_height) >> 1));
 }
 
 void h_closeWnd(Point p) {
@@ -56,8 +164,10 @@ int main(int argc, char *argv[]) {
     winid = init_context(&context, WINDOW_WIDTH, WINDOW_HEIGHT);
     cm = initClickManager(context);
 
+    loadBitmap(&pic, argv[1]);
     load_iconlist(wndRes, sizeof(wndRes) / sizeof(ICON));
 
+    modifyPic(context);
     deleteClickable(&cm.left_click, initRect(0, 0, 800, 600));
     addWndEvent(&cm);
 
@@ -73,7 +183,7 @@ int main(int argc, char *argv[]) {
 			break;
 		case MSG_UPDATE:
 			drawPicViewerWnd(context);
-			//drawPicViewerContent(context);
+			drawPicViewerContent(context, argv[1]);
 			updateWindow(winid, context.addr);
 			break;
 		case MSG_PARTIAL_UPDATE:

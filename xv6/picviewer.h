@@ -22,10 +22,12 @@
 #include "clickable.h"
 #include "fcntl.h"
 
+// 压缩图片
+void compressPic(int width, int height);
+
 // 绘图函数
 void drawPicViewerWnd(Context context);
-void drawPicViewerContent(Context context);
-void drawPicViewer(Context context);
+void drawPicViewerContent(Context context, char* fileName);
 
 void h_closeWnd(Point p);
 
