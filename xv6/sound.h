@@ -1,6 +1,6 @@
 #include "common.h"
 
-#define DMA_BUF_NUM  32 
+#define DMA_BUF_NUM  32
 #define DMA_SMP_NUM  0x100  //caozhangjie
 #define DMA_BUF_SIZE (DMA_SMP_NUM*2)
 

@@ -217,7 +217,7 @@ void soundInterrupt(void)
 }
 
 void playSound(void)
-{cprintf("czj2\n");
+{cprintf("xczz2\n");
     int i;
     //遍历声卡DMA的描述符列表，初始化每一个描述符buf指向缓冲队列中第一个音乐的数据块
     //每个数据块大小: DMA_BUF_SIZE
@@ -228,7 +228,7 @@ void playSound(void)
     }
 
     uint base = v2p(descriTable);
-cprintf("czj3 %x %x\n", base, v2p(soundQueue->data));
+cprintf("xczz3 %x %x\n", base, v2p(soundQueue->data));
     //开始播放: PCM_OUT
     if ((soundQueue->flag & PCM_OUT) == PCM_OUT)
     {
@@ -242,7 +242,7 @@ cprintf("czj3 %x %x\n", base, v2p(soundQueue->data));
         //enable interrupt
         outb(PO_CR, 0x05);
     }
-cprintf("czj4 %d \n",soundQueue->flag );
+cprintf("xczz4 %d \n",soundQueue->flag );
 }
 
 
@@ -259,7 +259,7 @@ void addSound(struct soundNode *node)
         ;
     *ptr = node;
 
-cprintf("czj1 %d \n", node->flag);
+cprintf("xczz1 %d \n", node->flag);
     //node is already the first
     //play sound
     if (soundQueue == node)

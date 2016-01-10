@@ -97,7 +97,6 @@ sys_wavdecode(void)
     }
     release(&decodelock.lock);
     // cprintf("playing waken up\n");
- cprintf("czjadress %x  %x %x\n", audiobuf, audiobuf[0].data, audiobuf[1].data);
     if (datacount == 0)
         memset(&audiobuf[bufcount], 0, sizeof(struct soundNode));
     //若soundNode的剩余大小大于数据大小，将数据写入soundNode中
@@ -161,6 +160,7 @@ sys_wavdecode(void)
 int
 sys_wavdecode_wav(void)
 {
+
     if(in == out && full == 0)
     {
         return -1;

@@ -60,7 +60,7 @@ void playmusic(Point point)
 {
     int pid;
     //char* argv[] = { "play", "qian.wav" };
-	char* argv[] = { "playmp3", "in.mp3" };
+    char* argv[] = { "playmp3", "in.mp3" };
     printf(0, "start playing music \n");
     pid = fork();
     if (pid < 0)

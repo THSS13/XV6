@@ -24,7 +24,7 @@ int bitsGet1;
 int needRewind;
 int bitsGet2;
 uint t1, t2;
-//caozhangjie
+
 
 
 int main()
