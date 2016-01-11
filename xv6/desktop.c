@@ -26,7 +26,7 @@ void shellinit(Point point)
         printf(1, "init shell: fork failed\n");
         exit();
     }
-    if (pid == 0) 
+    if (pid == 0)
     {
         exec("shell_gui", shell_argv);
         printf(1, "init shell: exec shell failed\n");
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     loadBitmap(&pic1, "music.bmp");
     loadBitmap(&pic2, "setting.bmp");
     loadBitmap(&pic3, "notes.bmp");
-    loadBitmap(&background, "bg.bmp");
+    //loadBitmap(&background, "bg.bmp");
     set_icon_alpha(&pic1);
     set_icon_alpha(&pic2);
     set_icon_alpha(&pic3);
@@ -120,7 +120,8 @@ int main(int argc, char *argv[])
         switch(msg.msg_type)
         {
             case MSG_UPDATE:
-                updateWindow(winid, context.addr);
+                printf(1, "msg_detail %d\n", msg.msg_detail);
+                updateWindow(winid, context.addr, msg.msg_detail);
                 //printf(0, "desktop");
                 /*if (isInit)
                 {
@@ -155,4 +156,3 @@ int main(int argc, char *argv[])
     free_context(&context, winid);
     exit();
 }
-

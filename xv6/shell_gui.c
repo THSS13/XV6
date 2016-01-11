@@ -4,7 +4,7 @@
  * Date: 2015.01.23
  * Version: 2.0
  *
- * TODO: 
+ * TODO:
  * 1. Add a cursor to the shell
  * 2. Support the arrow keys
  * 3. Support the text editor
@@ -26,7 +26,7 @@
 // The process of drawing is in drawingAPI.c
 #define HEADERHEIGHT 22
 #define FOOTERHEIGHT 22
-#define LEFTWIDTH 8 
+#define LEFTWIDTH 8
 #define RIGHTWIDTH 8
 
 // Define the width and height of a character
@@ -72,13 +72,13 @@ init_printer()
 void
 clean_printer(struct Context context)
 {
-    fill_rect(context, 0, HEADERHEIGHT, context.width, 
+    fill_rect(context, 0, HEADERHEIGHT, context.width,
             context.height - HEADERHEIGHT - FOOTERHEIGHT, BACKGROUNDCOLOR);
 }
 
-// Load the read_buf(0..len-1) into the buffer 
+// Load the read_buf(0..len-1) into the buffer
 // and print strings in the buffer to the screen
-void 
+void
 string_printer(struct Context context, char* read_buf, int len)
 {
     int i, j;
@@ -94,7 +94,7 @@ string_printer(struct Context context, char* read_buf, int len)
         }
     }
     else {
-        // Load the read_buf(0..len-1) into the buffer        
+        // Load the read_buf(0..len-1) into the buffer
         for (i = 0; i < len; i++) {
             if (read_buf[i] == '\n') {
                 line_index++;
@@ -105,7 +105,7 @@ string_printer(struct Context context, char* read_buf, int len)
                 char_index = 0;
                 memset(printer_buf[line_index], 0, sizeof(char) * CHARS);
             } else {
-                printer_buf[line_index][char_index++] = read_buf[i]; 
+                printer_buf[line_index][char_index++] = read_buf[i];
                 if (char_index >= CHARS) {
                     line_index++;
                     if (line_index >= LINES) {
@@ -114,24 +114,24 @@ string_printer(struct Context context, char* read_buf, int len)
                     }
                     char_index = 0;
                 }
-            } 
+            }
         }
     }
-    
+
     clean_printer(context);
     if (!isFull) {
-        // The buffer isn't full. 
+        // The buffer isn't full.
         // Just print 0..line_index lines to the screen.
         for (i = 0; i <= line_index; i++) {
-            puts_str(context, printer_buf[i], CHARCOLOR, 
+            puts_str(context, printer_buf[i], CHARCOLOR,
                     LEFTWIDTH, CHARHEIGHT * i + HEADERHEIGHT);
         }
     }
     else {
-        // The buffer is full. 
+        // The buffer is full.
         // Print (line_index+1)..LINES, 0..line_index lines to the screen.
         for (i = (line_index + 1) % LINES, j = 0; j < LINES; i = (i + 1) % LINES, j++) {
-            puts_str(context, printer_buf[i], CHARCOLOR, 
+            puts_str(context, printer_buf[i], CHARCOLOR,
                     LEFTWIDTH, CHARHEIGHT * j + HEADERHEIGHT);
         }
     }
@@ -145,19 +145,19 @@ struct windowinfo {
 };
 
 // Initialize the windowinfo
-void 
-init_window(struct windowinfo* winfo, char* title) 
+void
+init_window(struct windowinfo* winfo, char* title)
 {
-    winfo->id = init_context(&(winfo->context), 
-            CHARS*CHARWIDTH + LEFTWIDTH + RIGHTWIDTH, 
+    winfo->id = init_context(&(winfo->context),
+            CHARS*CHARWIDTH + LEFTWIDTH + RIGHTWIDTH,
             LINES*CHARHEIGHT + HEADERHEIGHT + FOOTERHEIGHT);
-    fill_rect(winfo->context, 0, 0, 
+    fill_rect(winfo->context, 0, 0,
             (winfo->context).width, (winfo->context).height, BACKGROUNDCOLOR);
     draw_window(winfo->context, title);
 }
 
 // Create the sh to run the command and build pipe between the gui and the sh.
-void 
+void
 create_shell(int* p_pid, int* p_rfd, int* p_wfd)
 {
     char *sh_argv[] = { "shell_sh", 0, 0 };
@@ -179,7 +179,7 @@ create_shell(int* p_pid, int* p_rfd, int* p_wfd)
         exit();
     }
     printf(1, "init pipe: pipe is ok\n");
-    
+
     printf(1, "init sh: starting sh\n");
     *p_pid = fork();
     if (*p_pid < 0) {
@@ -198,7 +198,7 @@ create_shell(int* p_pid, int* p_rfd, int* p_wfd)
         exec("shell_sh", sh_argv);
         printf(1, "init sh: exec sh failed\n");
         exit();
-    } 
+    }
     else {
         close(gui2sh_fd[0]);
         *p_wfd = gui2sh_fd[1];
@@ -259,7 +259,7 @@ handle_keydown(struct Context context, char ch, int rfd, int wfd) {
                     string_printer(context, read_buf, n);
                     // if the read_buf ends with init_string("$ "),
                     // the result is over and stop reading.
-                    if (read_buf[n - 2] == init_string[0] 
+                    if (read_buf[n - 2] == init_string[0]
                             && read_buf[n - 1] == init_string[1]) {
                         break;
                     }
@@ -272,7 +272,7 @@ handle_keydown(struct Context context, char ch, int rfd, int wfd) {
     }
 
     char toolongcmdhint[] = "\nThe command is too long!\n";
-    // The command cannot be longer than write_len. 
+    // The command cannot be longer than write_len.
     // Otherwise show the hint and clean the write_cmd buffer.
     if (strlen(write_cmd) == COMMANDMAXLEN - 1) {
         // Print the hint
@@ -319,13 +319,14 @@ main(int argc, char *argv[])
     cm = initClickManager(winfo.context);
     deleteClickable(&cm.left_click, initRect(0, 0, 800, 600));
     addWndEvent(&cm);
-    
+
     char write_cmd_ch;
     while (isRun) {
         getMsg(&(winfo.msg));
         switch(winfo.msg.msg_type) {
             case MSG_UPDATE:
-                updateWindow(winfo.id, winfo.context.addr);
+                printf(1, "msg_detail %d\n", winfo.msg.msg_detail);
+                updateWindow(winfo.id, winfo.context.addr, winfo.msg.msg_detail);
                 break;
             case MSG_LPRESS:
                 p = initPoint(winfo.msg.concrete_msg.msg_mouse.x,
@@ -335,13 +336,13 @@ main(int argc, char *argv[])
             case MSG_KEYDOWN:
                 write_cmd_ch = winfo.msg.concrete_msg.msg_key.key;
                 handle_keydown(winfo.context, write_cmd_ch, rfd, wfd);
-                updateWindow(winfo.id, winfo.context.addr);
+                updateWindow(winfo.id, winfo.context.addr, winfo.msg.msg_detail);
                 break;
             case MSG_PARTIAL_UPDATE:
-                updatePartialWindow(winfo.id, winfo.context.addr, 
-                        winfo.msg.concrete_msg.msg_partial_update.x1, 
-                        winfo.msg.concrete_msg.msg_partial_update.y1, 
-                        winfo.msg.concrete_msg.msg_partial_update.x2, 
+                updatePartialWindow(winfo.id, winfo.context.addr,
+                        winfo.msg.concrete_msg.msg_partial_update.x1,
+                        winfo.msg.concrete_msg.msg_partial_update.y1,
+                        winfo.msg.concrete_msg.msg_partial_update.x2,
                         winfo.msg.concrete_msg.msg_partial_update.y2);
                 break;
             default:
@@ -352,4 +353,3 @@ main(int argc, char *argv[])
     free_context(&(winfo.context), winfo.id);
     exit();
 }
-

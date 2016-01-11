@@ -214,9 +214,9 @@ struct Icon contentRes[] = { { "file_icon_big.bmp", 0, 0 }, {
 void drawItem(Context context, char *name, struct stat st, Rect rect, int chosen) {
 	//cprintf("draw finder Item: type=%d counter=%d\n", type, n);
 	unsigned short nameColor;
-	if (chosen == 0) 
+	if (chosen == 0)
 		nameColor = 0x0;
-	else 
+	else
 	{
 		nameColor = 0xFFFF;
 		fill_rect(context, rect.start.x, rect.start.y, rect.width, rect.height, 0x2110);
@@ -244,7 +244,7 @@ void drawItem(Context context, char *name, struct stat st, Rect rect, int chosen
 	} else {
 		switch (st.type) {
 		case T_FILE:
-			draw_picture(context, contentRes[FILE_ICON_SMALL].pic, 
+			draw_picture(context, contentRes[FILE_ICON_SMALL].pic,
 					rect.start.x + LIST_ITEM_OFFSET_X, rect.start.y + LIST_ITEM_OFFSET_Y);
 			char *size;
 			size = sizeFormat(st.size);
@@ -264,7 +264,7 @@ void drawItem(Context context, char *name, struct stat st, Rect rect, int chosen
 char *sizeFormat(uint size){
 	char* result = (char *) malloc(12 * sizeof(char));
 	int n = 0;
-	if (size > 0x400) 
+	if (size > 0x400)
 	{
 		size = size / (0x400);
 		do{
@@ -275,7 +275,7 @@ char *sizeFormat(uint size){
 		result[n++] = 'b';
 		result[n] = 0;
 	}
-	else 
+	else
 	{
 		do{
 			result[n++] = (size % 10) + '0';
@@ -640,14 +640,15 @@ int main(int argc, char *argv[]) {
 			p = initPoint(msg.concrete_msg.msg_mouse.x,
 					msg.concrete_msg.msg_mouse.y);
 			if (executeHandler(cm.double_click, p)) {
-				updateWindow(winid, context.addr);
+				updateWindow(winid, context.addr, msg.msg_detail);
 			}
 			break;
 		case MSG_UPDATE:
 			//printf(0, "update event!\n");
+			printf(1, "msg_detail %d\n", msg.msg_detail);
 			drawFinderWnd(context);
 			drawFinderContent(context);
-			updateWindow(winid, context.addr);
+			updateWindow(winid, context.addr, msg.msg_detail);
 			break;
 		case MSG_PARTIAL_UPDATE:
 			updatePartialWindow(winid, context.addr,
@@ -662,14 +663,14 @@ int main(int argc, char *argv[]) {
 					msg.concrete_msg.msg_mouse.y);
 			if (executeHandler(cm.left_click, p)) {
 
-				updateWindow(winid, context.addr);
+				updateWindow(winid, context.addr, msg.msg_detail);
 			}
 			break;
 		case MSG_RPRESS:
 			p = initPoint(msg.concrete_msg.msg_mouse.x,
 					msg.concrete_msg.msg_mouse.y);
 			if (executeHandler(cm.right_click, p)) {
-				updateWindow(winid, context.addr);
+				updateWindow(winid, context.addr, msg.msg_detail);
 			}
 			break;
 		default:
@@ -710,4 +711,3 @@ void testHandlers() {
 //	list(".");
 //	printItemList();
 }
-

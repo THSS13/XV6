@@ -24,6 +24,7 @@ int sys_destroyWindow()
 int sys_updateWindow()
 {
 	int window_id;
+	int detail;
 	color16* context;
 	WindowLink pWindow;
 	if (argint(0, &window_id) < 0)
@@ -36,7 +37,8 @@ int sys_updateWindow()
 	//cprintf("window size: %d\n", size);
 	if (size < 0) return -1;
 	if (argptr(1, (void*)&context, sizeof(color16) * size) < 0) return -1;
-	drawWindow(pWindow, context);
+	if (argint(2, &detail) < 0)		return -1;
+	drawWindow(pWindow, context, detail);
 	return 0;
 }
 
@@ -55,7 +57,7 @@ int sys_updatePartialWindow()
 	//cprintf("window size: %d\n", size);
 	if (size < 0) return -1;
 
-	if (argptr(1, (void*)&context, sizeof(color16) * size) < 0) 
+	if (argptr(1, (void*)&context, sizeof(color16) * size) < 0)
 		return -1;
 	if (argint(2, &x1) < 0 || argint(3, &y1) < 0 || argint(4, &x2) < 0 || argint(5, &y2) < 0)
 		return -1;

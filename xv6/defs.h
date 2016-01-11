@@ -211,7 +211,7 @@ int 			getClickedPid(int position_x, int position_y);
 struct Window* 	getWindowById(int window_id);
 struct Window* 	getWindowByPoint(int position_x, int position_y);
 void            drawScreen();
-void			drawWindow(struct Window*, ushort*);
+void			drawWindow(struct Window*, ushort*, int);
 void 			drawMouse(int newX, int newY);
 void 			drawArea(struct Window*, ushort*, int, int, int, int);
 void			drawScreenArea(int, int, int, int);
@@ -222,10 +222,10 @@ void            setMouse(int, int);
 //message.c
 void 			msgqueueinit();
 void 			msgtableinit();
-//int 			requireMsg(int, int, int, char);
+//int 			requireMsg(int, int, int, char, int);
 //void			dispatch(int, int);
 void 			createMsg(int, int, int, char);
-void 			createUpdateMsg(int);
+void 			createUpdateMsg(int, int);
 void			createPartialUpdateMsg(int, int, int, int, int);
 //void			getMsg(int, struct Msg*);
 

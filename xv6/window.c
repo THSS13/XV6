@@ -14,6 +14,7 @@ int next_window_id = 1;
 //static color16* vesa_array = (color16*)VESA_ADDR;
 static color16* vesa_array;
 static color16 vesa_buffer[480000];
+static color16 vesa_buffer2[480000];
 
 
 static int mouseX = -1;
@@ -50,9 +51,11 @@ WindowLink allocWindow(int left_x, int left_y, int right_x, int right_y, int pid
 			p->prior_window = list_tail;
 			list_tail = p;
 			p->next_window = 0;
-            activated_window = p;
-			createUpdateMsg(p->pid);
-			//cprintf("UpdateMsg created for process: %d\n", p->pid);
+      activated_window = p;
+      memmove(vesa_buffer2, vesa_buffer, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(color16));
+			createUpdateMsg(p->pid, 1);
+      //drawWindow(p, )
+      //cprintf("UpdateMsg created for process: %d\n", p->pid);
 			return p;
 		}
 	}
@@ -66,16 +69,16 @@ int releaseWindow(int window_id)
 	{
 		if (p->window_id == window_id)
 		{
-			if (p->prior_window != 0) 
+			if (p->prior_window != 0)
 				p->prior_window->next_window = p->next_window;
 			else
 				list_head = p->next_window;
-			if (p->next_window != 0) 
+			if (p->next_window != 0)
 				p->next_window->prior_window = p->prior_window;
 			else
 				list_tail = p->prior_window;
 			p->window_id = -1;
-			drawScreen();
+			createUpdateMsg(list_head->pid, 2);
 			return 0;
 		}
 	}
@@ -99,11 +102,11 @@ void setActivated(WindowLink p)
         return;
     }
 
-	if (p->prior_window != 0) 
+	if (p->prior_window != 0)
 		p->prior_window->next_window = p->next_window;
 	else
 		list_head = p->next_window;
-	if (p->next_window != 0) 
+	if (p->next_window != 0)
 		p->next_window->prior_window = p->prior_window;
 	else
 		list_tail = p->prior_window;
@@ -113,8 +116,9 @@ void setActivated(WindowLink p)
 	p->prior_window = list_tail;
 	list_tail = p;
 	p->next_window = 0;
-    activated_window = p;
-	createUpdateMsg(p->pid);
+  activated_window = p;
+
+	createUpdateMsg(list_head->pid, 3);
 }
 
 int getClickedPid(int position_x, int position_y)
@@ -126,7 +130,7 @@ int getClickedPid(int position_x, int position_y)
 WindowLink getWindowById(int window_id)
 {
 	WindowLink p = list_head;
-	while (p != 0 && p->window_id != window_id) 
+	while (p != 0 && p->window_id != window_id)
 	{
 		//cprintf("now: %d, target: %d\n", p->window_id, window_id);
 		//cprintf("next: %d\n", p->next_window);
@@ -142,45 +146,63 @@ WindowLink getWindowByPoint(int position_x, int position_y)
 	return p;
 }
 
-void drawWindow(WindowLink pWindow, color16* context)
+//detail : update case
+// 0: not a update event
+// 1: allocate a new window
+// 2: release a window
+// 3: activate a back window
+// 4: drag event
+void drawWindow(WindowLink pWindow, color16* context, int detail)
 {
+  cprintf("event %d\n", detail);
 	int i, j;
 	int x1 = (pWindow->window_position).left_x;
 	int y1 = (pWindow->window_position).left_y;
 	int x2 = (pWindow->window_position).right_x;
 	int y2 = (pWindow->window_position).right_y;
-	//cprintf("window_id: %d, x1: %d, y1: %d, x2: %d, y2: %d\n", pWindow->window_id, x1, y1, x2, y2);
-	/*for (i = x1; i < x2; i++)
-		for (j = y1; j < y2; j++)
-		{	
-			//WindowLink qWindow = list_tail;
-			while (qWindow != pWindow && inClientRect(qWindow, i, j)) qWindow = qWindow->prior_window;
-			vesa_array[j * SCREEN_WIDTH + i] = qWindow == pWindow ? context[(j - y1) * (x2 - x1) + i - x1] : vesa_array[j * SCREEN_WIDTH + i];
-			//vesa_array[i*SCREEN_HEIGHT + j] = 2016;
-		}
-*/
-    for (j = y1; j < y2; j++)
-        for (i = x1; i < x2; i++)
-        {
-            //WindowLink qWindow = list_tail;
-			//while (qWindow != pWindow && inClientRect(qWindow, i, j)) qWindow = qWindow->prior_window;
-            //if (qWindow == pWindow)         
-        	    vesa_buffer[j * SCREEN_WIDTH + i] = context[(j - y1) * (x2 - x1) + i - x1];
-        }
-        	//vesa_buffer[j * SCREEN_WIDTH + i] = context[(j - y1) * (x2 - x1) + i - x1];
-        	//vesa_array[j * SCREEN_WIDTH + i] = context[(j - y1) * (x2 - x1) + i - x1];
-    if (pWindow->next_window != 0)
-        createUpdateMsg(pWindow->next_window->pid);
-    else
-    {
-    	memmove(vesa_array, vesa_buffer, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(color16));
-   		drawMouse(mouseX, mouseY);
+
+  if (detail == 4){
+    memmove(vesa_buffer, vesa_buffer2, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(color16));
+    for (j = y1; j < y2; j++){
+      for (i = x1; i < x2; i++){
+        vesa_buffer[j * SCREEN_WIDTH + i] = context[(j - y1) * (x2 - x1) + i - x1];
+      }
     }
+  }
+  else{
+    if ((pWindow->next_window != 0) || (pWindow->next_window == 0 && pWindow->prior_window == 0)){
+      cprintf("nima\n");
+      for (j = y1; j < y2; j++){
+        for (i = x1; i < x2; i++){
+          vesa_buffer2[j * SCREEN_WIDTH + i] = context[(j - y1) * (x2 - x1) + i - x1];
+          vesa_buffer[j * SCREEN_WIDTH + i] = context[(j - y1) * (x2 - x1) + i - x1];
+        }
+      }
+    }
+    else{
+      cprintf("caonima\n");
+      for (j = y1; j < y2; j++){
+        for (i = x1; i < x2; i++){
+          vesa_buffer[j * SCREEN_WIDTH + i] = context[(j - y1) * (x2 - x1) + i - x1];
+        }
+      }
+    }
+  }
+  if (pWindow->next_window != 0 && detail != 4){
+      createUpdateMsg(pWindow->next_window->pid, detail);
+  }
+  else
+  {
+  	memmove(vesa_array, vesa_buffer, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(color16));
+ 		drawMouse(mouseX, mouseY);
+  }
 }
 
+//only used in mouse drag event
 void drawScreen()
 {
-	createUpdateMsg(list_head->pid);
+  //cprintf("draw screen\n");
+	createUpdateMsg(list_tail->pid, 4);
 }
 
 void printRect(Rect rect)
@@ -201,18 +223,30 @@ void drawArea(WindowLink pWindow, color16* context, int x1, int y1, int x2, int 
 	area.right_y = y2;
 	dest = getIntersection(area, pWindow->window_position);
 	//printRect(dest);
-	for (j = dest.left_y; j < dest.right_y; j++)
-		for (i = dest.left_x; i < dest.right_x; i++)
-        	vesa_buffer[j * SCREEN_WIDTH + i] = context[(j - clientRect.left_y) * (clientRect.right_x - clientRect.left_x) + i - clientRect.left_x];
-   	if (pWindow->next_window != 0)
-   		createPartialUpdateMsg(pWindow->next_window->pid, x1, y1, x2, y2);
-   	else
-   	{
-   		for (j = y1; j < y2; j++)
-   			for (i = x1; i < x2; i++)
-   				vesa_array[j * SCREEN_WIDTH + i] = vesa_buffer[j * SCREEN_WIDTH + i];
-   		drawMouse(mouseX, mouseY);
-   	}
+  if ((pWindow->next_window != 0) || (pWindow->next_window == 0 && pWindow->prior_window == 0)){
+    for (j = dest.left_y; j < dest.right_y; j++){
+      for (i = dest.left_x; i < dest.right_x; i++){
+        vesa_buffer2[j * SCREEN_WIDTH + i] = context[(j - clientRect.left_y) * (clientRect.right_x - clientRect.left_x) + i - clientRect.left_x];
+        vesa_buffer[j * SCREEN_WIDTH + i] = context[(j - clientRect.left_y) * (clientRect.right_x - clientRect.left_x) + i - clientRect.left_x];
+      }
+    }
+  }
+  else{
+    for (j = dest.left_y; j < dest.right_y; j++){
+      for (i = dest.left_x; i < dest.right_x; i++){
+        vesa_buffer[j * SCREEN_WIDTH + i] = context[(j - clientRect.left_y) * (clientRect.right_x - clientRect.left_x) + i - clientRect.left_x];
+      }
+    }
+  }
+ 	if (pWindow->next_window != 0)
+ 		createPartialUpdateMsg(pWindow->next_window->pid, x1, y1, x2, y2);
+ 	else
+ 	{
+ 		for (j = y1; j < y2; j++)
+ 			for (i = x1; i < x2; i++)
+ 				vesa_array[j * SCREEN_WIDTH + i] = vesa_buffer[j * SCREEN_WIDTH + i];
+ 		drawMouse(mouseX, mouseY);
+ 	}
 }
 
 void drawScreenArea(int x1, int y1, int x2, int y2)

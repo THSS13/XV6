@@ -321,7 +321,7 @@ mouseintr(uint tick)
 	// 			dragging_count = (dragging_count + 1) % 5;
 	// 			if(dragging_count != 0)
 	// 				return;
-	// 			if(x_drag_window + (x_position - x_drag_start) < 0 || 
+	// 			if(x_drag_window + (x_position - x_drag_start) < 0 ||
 	// 				x_drag_window + (x_position - x_drag_start) + WindowWidth > SCREEN_WIDTH ||
 	// 				y_drag_window + (y_position - y_drag_start) < 0 ||
 	// 				y_drag_window + (y_position - y_drag_start) + WindowHeight > SCREEN_HEIGHT)
