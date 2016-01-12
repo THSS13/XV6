@@ -2,91 +2,127 @@
 #define pi 3.1415926535898 
 int abs(int x)
 {
-	if (x < 0)
-		return x * -1;
-	else
-		return x;
+	return (x>= 0 ? x : -x);
 }
+
 double sin(double x)  
 {  
-	double Result=x,Fac=1.0,Xn=x,Precious=x;  
-	int n=1,sign=1;  
-	while(Precious>1e-6)  
-	{  
-		n = n+1;  
-		Fac=Fac*n*(n + 1);
-		n = n + 1;  
-		Xn*=x*x;  
-		sign=-sign;  
-		Precious=Xn/Fac;  
-		Result=sign>0?Result+Precious:Result-Precious;  
-	}  
-	return Result;  
+   register double ret;
+   __asm__ (
+      "fsin"
+      : "=t" (ret)
+      : "0" (x)
+   );
+   return ret;
 }  
+
 double cos(double x)  
 {  
-	return sin(pi/2-x);  
+	register double ret;
+   __asm__(
+      "fcos"
+      : "=t" (ret)
+      : "0" (x)
+   );
+   return ret;  
 }  
+
 double tan(double x)  
 {  
-	return sin(x)/cos(x);  
+   register double ret;
+   register double value;
+   __asm__(
+      "fptan"
+      : "=t" (value),
+      "=u" (ret)
+      : "0" (x)
+   );
+   return ret;
 }  
+
+double log2(double x)
+{
+   register double ret;
+   __asm__(
+      "fld1\n\t"
+      "fxch\n\t"
+      "fyl2x"
+      : "=t" (ret)
+      : "0" (x)
+   );
+   return ret;
+}
 
 double pow(double x, double y)
 {
-	if(x==0 && y!=0) return 0;
-	else if(x==0 && y==0) return 1;
-	else if(y<0) return 1/pow(x,-y);//把指数小于0的情况转为1/x^-y计算
-	else if(x<0 && y-(int)y!=0) return 0;//若x为负，且y不为整数数，则出错，返回0  
-	else if(x<0 && y-(int)y==0)//若x为负，且y为整数数，则用循环计算 
-	{
-		double powint=1;
-		int i;
-		for(i=1;i<=y;i++) powint*=x;
-		return powint;
-	}
-	return exp(y*ln(x));
+   register double ret, value;
+   double r = 1.0;
+   long p = (long) y;
+   if (x == 0.0 && y > 0.0)
+      return 0.0;
+   if (y == (double) p)
+   {
+      if (p == 0)
+        return 1.0;
+      if (p < 0)
+      {
+        p = -p;
+        x = 1.0 / x;
+      }
+      while (1)
+      {
+        if (p & 1)
+           r *= x;
+        p >>= 1;
+        if (p == 0)
+           return r;
+        x *= x;
+      }
+   }
+   __asm__(
+      "fmul  %%st(1);"
+      "fst   %%st(1);"
+      "frndint;\n\t"
+      "fxch;\n\t"
+      "fsub %%st(1);\n\t"
+      "f2xm1;\n\t"
+      : "=t" (ret), "=u" (value)
+      :  "0" (log2 (x)), "1" (y)
+   );
+   ret += 1.0;
+   __asm__(
+      "fscale"
+      : "=t" (ret)
+      : "0" (ret), "u" (value)
+   );
+   return ret;
 }
 // 求根
 double sqrt(double x)
 {
-	return pow(x,0.5);
+	register double ret;
+   __asm__(
+      "fsqrt"
+      : "=t" (ret)
+      : "0" (x)
+      );
+   return ret;
 }
 
 // ln(x) = 2 arctanh((x-1)/(x+1))
 // 调用了Arctanh(double) 方法
 double ln(double x)
 {
-	double y=x-1,ln_p1=0,ln_p2=0,ln_p3=0,ln_px=0,ln_tmp=1,dln_px=1,tmp;
-	int l;
-	if(x==1) return 0;
-	else if(x>2) return -ln(1/x);
-	else if(x<.1)
-	{
-		double n=-1;
-		double a;
-		do
-		{
-			n=n-.6;
-			a=x/exp(n);
-		}
-		while(a>2 || a<1);
-		return ln(a)+n;
-	}
-	for(l=1,tmp=1;(ln_px-ln_tmp)>1e-9 || (ln_px-ln_tmp)<-1e-9;l++)
-	{
-		ln_tmp=ln_px;
-		tmp*=y;
-		if(l==1) tmp=tmp/l;
-		else tmp=tmp/-l;
-		ln_p1+=tmp;
-		ln_p2=ln_p1+-1*tmp*y*l/(l+1);
-		ln_p3=ln_p2+tmp*y*y*l/(l+2);
-		dln_px=ln_p3-ln_p2;
-		ln_px=ln_p3-dln_px*dln_px/(ln_p3-2*ln_p2+ln_p1);
-		tmp*=l;
-	}
-	return ln_px;
+	register double ret;
+   __asm__(
+      "fldln2\n\t"
+      "fxch\n\t"
+      "fyl2x"
+      : "=t" (ret)
+      : "0" (x)
+   );
+
+   return ret;
 }
 
 // 求e^x 用于Pow( double, double )调用
@@ -94,20 +130,23 @@ double ln(double x)
 // 精度为7位
 double exp( double x )
 {
-	double y=x,ex_p1=0,ex_p2=0,ex_p3=0,ex_px=0,ex_tmp=1,dex_px=1,tmp;
-	int l;
-	if(x==0) return 1;
-	if(x<0) return 1/exp(-x); 
-	for(l=1,tmp=1;((ex_px-ex_tmp)>1e-10 || (ex_px-ex_tmp)<-1e-10) && dex_px>1e-10;l++)
-	{
-		ex_tmp=ex_px;
-		tmp*=y;
-		tmp=tmp/l;
-		ex_p1+=tmp;
-		ex_p2=ex_p1+tmp*y/(l+1);
-		ex_p3=ex_p2+tmp*y*y/(l+1)/(l+2);
-		dex_px=ex_p3-ex_p2;
-		ex_px=ex_p3-dex_px*dex_px/(ex_p3-2*ex_p2+ex_p1);
-	}
-	return ex_px+1;
+	register double ret, value;
+   __asm__(
+      "fldl2e;"   
+      "fmul %%st(1);"
+      "fst  %%st(1);\n\t"
+      "frndint;"        
+      "fxch;\n\t"
+      "fsub %%st(1);" 
+      "f2xm1"
+      : "=t" (ret), "=u" (value)
+      : "0" (x)
+   );
+   ret += 1.0;
+   __asm__(
+      "fscale"
+      : "=t" (ret)
+      : "0" (ret), "u" (value)
+   );
+   return ret;
 }

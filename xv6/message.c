@@ -50,8 +50,10 @@ int requireMsg(int msg_type, int pos_x, int pos_y, char key)
 			}
 			else
 			{
-				MsgQueue[i].concrete_msg.msg_mouse.x = pos_x;
-				MsgQueue[i].concrete_msg.msg_mouse.y = pos_y;
+				//MsgQueue[i].concrete_msg.msg_mouse.x = pos_x;
+				//MsgQueue[i].concrete_msg.msg_mouse.y = pos_y;
+				MsgQueue[i].concrete_msg.msg_mouse.x = 227;
+				MsgQueue[i].concrete_msg.msg_mouse.y = 452;
 			}
 			return i;
 		}

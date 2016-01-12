@@ -3,6 +3,7 @@
 #include "message.h"
 #include "types.h"
 #include "user.h"
+
 Point initPoint(int x, int y)
 {
 	Point p;
@@ -22,6 +23,8 @@ Rect initRect(int x, int y, int w, int h)
 
 int isIn(Point p, Rect r)
 {
+	//printf(0, "Click point: %d %d\n", p.x, p.y);
+	//printf(0, "Rect area: %d %d %d %d\n",r.start.x, r.start.y, r.start.x+r.width, r.start.y+r.height);
 	return (p.x >= r.start.x) && (p.x < r.start.x+r.width)
 			&& (p.y >= r.start.y) && (p.y < r.start.y+r.height);
 }
@@ -113,6 +116,7 @@ int executeHandler(Clickable *head, Point click)
 	Clickable *cur = head;
 	while (cur != 0)
 	{
+		printf(0, "CurArea:X:%d Y:%d\n", cur->area.start.x, cur->area.start.y);
 		if (isIn(click, cur->area))
 		{
 			cur->handler(click);

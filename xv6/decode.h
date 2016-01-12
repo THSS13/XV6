@@ -21,8 +21,8 @@ void III_hybrid(double fsIn[SSLIMIT], double tsOut[SSLIMIT], int sb, int ch, str
 void create_syn_filter(double filter[64][SBLIMIT]);
 void read_syn_window(double window[HAN_SIZE]);
 int SubBandSynthesis (double *bandPtr, int channel, short *samples);
-
-void out_fifo(short pcm_sample[2][SSLIMIT][SBLIMIT], int num, struct frame_params *fr_ps, unsigned long *psampFrames);
+//caozhangjie
+void out_fifo(short pcm_sample[2][SSLIMIT][SBLIMIT], int num, struct frame_params *fr_ps, int fd, unsigned long *psampFrames);
 void buffer_CRC(Bit_stream_struc *bs, unsigned int *old_crc);
 int main_data_slots(struct frame_params fr_ps);
 

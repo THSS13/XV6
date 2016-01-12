@@ -58,7 +58,7 @@ TOOLPREFIX := $(shell if i386-jos-elf-objdump -i 2>&1 | grep '^elf32-i386$$' >/d
 endif
 
 # If the makefile can't find QEMU, specify its path here
-# QEMU = qemu-system-i386
+QEMU = /usr/bin/qemu-system-i386
 
 # Try to infer the correct QEMU
 ifndef QEMU
@@ -229,7 +229,7 @@ clean:
 	rm -f *.tex *.dvi *.idx *.aux *.log *.ind *.ilg \
 	*.o *.d *.asm *.sym vectors.S bootblock entryother \
 	initcode initcode.out kernel xv6.img fs.img kernelmemfs mkfs \
-	.gdbinit .asm .sym \
+	.gdbinit \
 	$(UPROGS)
 
 # make a printout

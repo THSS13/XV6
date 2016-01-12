@@ -23,7 +23,7 @@ main(int argc, char *argv[])
 
   read(fd, &info, sizeof(struct wav));
   if ((info.riff_id != 0x46464952)||(info.wave_id != 0x45564157)) {
-    printf(0, "invalid file format\n");
+    printf(0, "xuja invalid file format\n");
     close(fd);
     exit();
   }

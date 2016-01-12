@@ -1,7 +1,7 @@
 #include "common.h"
 
-#define DMA_BUF_NUM  32 
-#define DMA_SMP_NUM  0x80
+#define DMA_BUF_NUM  32
+#define DMA_SMP_NUM  0x100  //caozhangjie
 #define DMA_BUF_SIZE (DMA_SMP_NUM*2)
 
 struct fmt {
@@ -24,7 +24,7 @@ struct wav{
   uint dlen;
 };
 
-#define	BUFSIZE	4096
+#define	BUFSIZE	16384  //caozhangjie
 struct coreBuf{
 	unsigned int buf[BUFSIZE];
 	unsigned int buf_bit_idx;

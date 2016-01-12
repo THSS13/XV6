@@ -59,7 +59,8 @@ void finderinit(Point point)
 void playmusic(Point point)
 {
     int pid;
-    char* argv[] = { "play", "qian.wav" };
+    //char* argv[] = { "play", "qian.wav" };
+    char* argv[] = { "playmp3", "in.mp3" };
     printf(0, "start playing music \n");
     pid = fork();
     if (pid < 0)
@@ -69,7 +70,8 @@ void playmusic(Point point)
     }
     if (pid == 0)
     {
-        exec("play", argv);
+        //exec("play", argv);
+	exec("playmp3",argv);
         printf(1, "init play: exec play failed\n");
         exit();
     }

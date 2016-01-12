@@ -35,7 +35,7 @@
 #define	PI4					PI/4
 
 /* Õ∑–≈œ¢ Structure */
-typedef struct {
+typedef struct layer{
     int version;
     int lay;
     int error_protection;

@@ -9,7 +9,6 @@
 #include "traps.h"
 #include "spinlock.h"
 #include "memlayout.h"
-
 /*
  * Reference to Intel doc AC97
  */
@@ -54,9 +53,9 @@ uint read_pci_config(uchar bus, uchar slot, uchar func, uchar offset)
     uint tmp, res;
     tmp = 0x80000000 | (bus << 16) | (slot << 11) | (func << 8) | offset;
     outsl(0xcf8, &tmp, 1);
-    insl(0xcf8, &tmp, 1);
     cprintf("search bus: %x\n", tmp);
-    insl(0xcfc, &res, 1);
+insl(0xcf8, &tmp, 1); 
+insl(0xcfc, &res, 1);
     return res;
 }
 
@@ -99,9 +98,8 @@ void soundinit(void)
 void 
 soundcardinit(uchar bus, uchar slot, uchar func)
 {
-	uint tmp, vendorID, inter;
+	uint tmp, vendorID;
 	ushort vendorID1, vendorID2;
-
 	
 	//Initailize Interruption
 	initlock(&soundLock, "audio");
@@ -130,7 +128,6 @@ soundcardinit(uchar bus, uchar slot, uchar func)
 	tmp = inw(NAMBA_PCMV);
 	cprintf("%x\n", tmp);
 	outw(NAMBA_PCMV, 0x8000);
-	tmp = inw(NAMBA_PCMV);
 	if (inw(NAMBA_PCMV) != 0x8000)
 	{
 		cprintf("Audio Codec Function not found!\n");
@@ -148,19 +145,6 @@ soundcardinit(uchar bus, uchar slot, uchar func)
 	vendorID = (vendorID2 << 16) + vendorID1;
 	write_pci_config(bus, slot, func, PCI_CONFIG_SPACE_SID_SVID, vendorID);
 	
-    //Read the infomation of interruption
-    inter = read_pci_config(bus, slot, func, PCI_CONFIG_SPACE_INTRL);
-    cprintf("interrupt info:%x\n", inter);
-
-    //BDBAR
-        
-    uint temp;
-    uint base = v2p(descriTable);
-    cprintf("base: %x\n", base);
-    outsl(PO_BDBAR, &base, 1);
-    insl(PO_BDBAR, &temp, 1);
-    cprintf("temp: %x\n", temp);
-        
 }
 
 /*
@@ -233,9 +217,8 @@ void soundInterrupt(void)
 }
 
 void playSound(void)
-{
+{cprintf("xczz2\n");
     int i;
-
     //遍历声卡DMA的描述符列表，初始化每一个描述符buf指向缓冲队列中第一个音乐的数据块
     //每个数据块大小: DMA_BUF_SIZE
     for (i = 0; i < DMA_BUF_NUM; i++)
@@ -244,26 +227,14 @@ void playSound(void)
         descriTable[i].cmd_len = 0x80000000 + DMA_SMP_NUM;
     }
 
-//    uint base = v2p(descriTable);
-//    cprintf("address of base: %x\n", &base);
-
+    uint base = v2p(descriTable);
+cprintf("xczz3 %x %x\n", base, v2p(soundQueue->data));
     //开始播放: PCM_OUT
     if ((soundQueue->flag & PCM_OUT) == PCM_OUT)
     {
-     //   cprintf("PO_BDBAR: %x\n", PO_BDBAR);
         //init base register
         //将内存地址base开始的1个双字写到PO_BDBAR
-        //cprintf("base: %x\n", base);
-        //outsl(PO_BDBAR, &base, 1);
-     //   insl(PO_BDBAR, &temp, 1);
-     //   cprintf("temp: %x\n", temp);
-     //   for(i = 0; i < DMA_BUF_NUM; i++)
-     //   {
-     //       ptr = (struct descriptor *)p2v(temp);
-     //       dataPtr = (uchar *)ptr[i].buf;
-     //       dataPtr = P2V_WO(dataPtr);
-     //       cprintf("%d: %d\n", i, *dataPtr);
-     //   }
+        outsl(PO_BDBAR, &base, 1);
         //init last valid index
         outb(PO_LVI, 0x1F);
         //init control register
@@ -271,14 +242,15 @@ void playSound(void)
         //enable interrupt
         outb(PO_CR, 0x05);
     }
+cprintf("xczz4 %d \n",soundQueue->flag );
 }
 
 
 //add sound-piece to the end of queue
 void addSound(struct soundNode *node)
 {   
-    struct soundNode **ptr;
 
+    struct soundNode **ptr;
 
     acquire(&soundLock);
 
@@ -287,7 +259,7 @@ void addSound(struct soundNode *node)
         ;
     *ptr = node;
 
-
+cprintf("xczz1 %d \n", node->flag);
     //node is already the first
     //play sound
     if (soundQueue == node)
