@@ -15,6 +15,9 @@ struct MsgTableEntry MsgTable[MAX_PROCESS_NUMBER];
 int mouse_x;
 int mouse_y;
 
+int update_msg = 0;
+#define MAX_UPDATE_MSG 5
+
 void msgqueueinit()
 {
     mouse_x = -1;
@@ -50,6 +53,10 @@ int requireMsg(int msg_type, int pos_x, int pos_y, char key, int detail)
 			{
 				MsgQueue[i].concrete_msg.msg_key.key = key;
 			}
+      else if (msg_type == MSG_UPDATE && detail == 4)
+      {
+        update_msg++;
+      }
 			else
 			{
 				MsgQueue[i].concrete_msg.msg_mouse.x = pos_x;
@@ -88,9 +95,26 @@ void dispatch(int pid, int msg_index)
 		if(MsgTable[i].pid == pid)
 		{
 			int temp_msg_index = MsgTable[i].first_msg;
+      int temp2_msg_index = 0;
+      if (update_msg > MAX_UPDATE_MSG){
+        if (MsgQueue[temp_msg_index].msg_type == MSG_UPDATE && MsgQueue[temp_msg_index].msg_detail == 4){
+          MsgQueue[temp_msg_index].msg_type = MSG_UNUSED;
+          MsgTable[i].first_msg = MsgQueue[temp_msg_index].next_msg;
+          update_msg--;
+        }
+      }
 			while(MsgQueue[temp_msg_index].next_msg != -1)
 			{
-				temp_msg_index = MsgQueue[temp_msg_index].next_msg;
+				temp2_msg_index = MsgQueue[temp_msg_index].next_msg;
+        if (update_msg > MAX_UPDATE_MSG){
+          if (MsgQueue[temp2_msg_index].msg_type == MSG_UPDATE && MsgQueue[temp2_msg_index].msg_detail == 4){
+            MsgQueue[temp2_msg_index].msg_type = MSG_UNUSED;
+            MsgQueue[temp_msg_index].next_msg = MsgQueue[temp2_msg_index].next_msg;
+            temp2_msg_index = MsgQueue[temp2_msg_index].next_msg;
+            update_msg--;
+          }
+        }
+        temp_msg_index = temp2_msg_index;
 			}
 			MsgQueue[temp_msg_index].next_msg = msg_index;
 			MsgQueue[msg_index].next_msg = -1;
