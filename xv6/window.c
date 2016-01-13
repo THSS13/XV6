@@ -3,6 +3,7 @@
 #include "window.h"
 #define MAXWINDOW 20
 
+unsigned int mouse_lock = 0;
 WindowLink window_list = 0;
 WindowLink activated_window = 0;
 WindowLink list_head = 0;
@@ -51,8 +52,8 @@ WindowLink allocWindow(int left_x, int left_y, int right_x, int right_y, int pid
 			p->prior_window = list_tail;
 			list_tail = p;
 			p->next_window = 0;
-      activated_window = p;
-      memmove(vesa_buffer2, vesa_buffer, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(color16));
+            activated_window = p;
+            memmove(vesa_buffer2, vesa_buffer, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(color16));
 			createUpdateMsg(p->pid, 1);
       //drawWindow(p, )
       //cprintf("UpdateMsg created for process: %d\n", p->pid);
@@ -116,8 +117,8 @@ void setActivated(WindowLink p)
 	p->prior_window = list_tail;
 	list_tail = p;
 	p->next_window = 0;
-  activated_window = p;
-
+    activated_window = p;
+    mouse_lock = 1;
 	createUpdateMsg(list_head->pid, 3);
 }
 
@@ -194,7 +195,8 @@ void drawWindow(WindowLink pWindow, color16* context, int detail)
   else
   {
   	memmove(vesa_array, vesa_buffer, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(color16));
- 		drawMouse(mouseX, mouseY);
+    mouse_lock = 0;
+ 	drawMouse(mouseX, mouseY);
   }
 }
 
@@ -245,6 +247,7 @@ void drawArea(WindowLink pWindow, color16* context, int x1, int y1, int x2, int 
  		for (j = y1; j < y2; j++)
  			for (i = x1; i < x2; i++)
  				vesa_array[j * SCREEN_WIDTH + i] = vesa_buffer[j * SCREEN_WIDTH + i];
+        mouse_lock = 0;
  		drawMouse(mouseX, mouseY);
  	}
 }
@@ -330,6 +333,7 @@ void setMouse(int x, int y)
 
 void drawMouse(int x, int y)
 {
+    if (mouse_lock) return;
 	int i, j;
     if (x < 0) return;
 	if (mouseX >= 0)
