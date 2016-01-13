@@ -165,7 +165,8 @@ void createMsg(int msg_type, int pos_x, int pos_y, char key)
 
         if(msg_type == MSG_LPRESS || msg_type == MSG_RPRESS || msg_type == MSG_DOUBLECLICK)
         {
-            setActivated(win_ptr);
+            if (win_ptr->next_window != 0)
+                setActivated(win_ptr);
             msg_index = requireMsg(msg_type, x, y, key, 0);
 	        if (msg_index == -1) return;
             dispatch(pid, msg_index);
