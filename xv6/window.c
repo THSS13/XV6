@@ -172,7 +172,6 @@ void drawWindow(WindowLink pWindow, color16* context, int detail)
   }
   else{
     if ((pWindow->next_window != 0) || (pWindow->next_window == 0 && pWindow->prior_window == 0)){
-      cprintf("nima\n");
       for (j = y1; j < y2; j++){
         for (i = x1; i < x2; i++){
           vesa_buffer2[j * SCREEN_WIDTH + i] = context[(j - y1) * (x2 - x1) + i - x1];
@@ -181,7 +180,6 @@ void drawWindow(WindowLink pWindow, color16* context, int detail)
       }
     }
     else{
-      cprintf("caonima\n");
       for (j = y1; j < y2; j++){
         for (i = x1; i < x2; i++){
           vesa_buffer[j * SCREEN_WIDTH + i] = context[(j - y1) * (x2 - x1) + i - x1];
