@@ -217,6 +217,10 @@ UPROGS=\
 	_ren\
 	_splice\
 	_cal\
+	_shutdown\
+	_reboot\
+	_clear\
+	_vim\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS) hankaku.txt HZK16.fnt close.bmp foldericon.bmp viewingmode1.bmp viewingmode2.bmp createfile.bmp createfolder.bmp up.bmp gamecenter.bmp folder_icon_big.bmp folder_icon_small.bmp file_icon_big.bmp file_icon_small.bmp bg.bmp music.bmp notes.bmp setting.bmp trash.bmp qian.wav test.wav in.mp3
@@ -292,6 +296,7 @@ EXTRA=\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 	touch.c cp.c uptime.c mv.c editor.c script.c cal.c\
+	shutdown.c reboot.c clear.c vim.c\
 
 dist:
 	rm -rf dist

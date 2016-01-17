@@ -6,10 +6,23 @@
 #include "defs.h"
 #include "x86.h"
 #include "elf.h"
+#include "execvim.h"
+int execvim;
+char content[2000];
 
 int
 exec(char *path, char **argv)
 {
+  execvim = 0;
+  if(path[0] == 'v' && path[1] == 'i' && path[2] == 'm' && path[3] == 0){
+    if(argv[1] && argv[2] && !argv[3]){
+      execvim = 1;
+      while(execvim) ;
+      argv[3] = content;
+    }
+    else
+      return 0;
+  }
   char *s, *last;
   int i, off;
   uint argc, sz, sp, ustack[3+MAXARG+1];
