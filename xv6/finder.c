@@ -49,6 +49,27 @@
 struct Context context;
 ClickableManager cm;
 int isRun = 1;
+
+void textEditor_init(char *fileName)
+{
+    int pid;
+    char* editor_argv[] = { "textEditor_gui", fileName};
+
+    printf(1, "init textEditor: starting editor\n");
+    pid = fork();
+    if (pid < 0)
+    {
+        printf(1, "init textEditor: fork failed\n");
+        exit();
+    }
+    if (pid == 0)
+    {
+        exec("txtEditor_gui", editor_argv);
+        printf(1, "init textEditor: exec editor failed\n");
+        exit();
+    }
+}
+
 // 文件项
 struct fileItem {
 	struct stat st;
@@ -85,6 +106,7 @@ void h_newFile(Point p);
 void h_newFolder(Point p);
 void h_deleteFile(Point p);
 void h_chooseFile(Point p);
+void h_openFile(Point p);
 void h_closeWnd(Point p);
 void h_empty(Point p);
 void h_chvm2(Point p);
@@ -96,6 +118,9 @@ char * sizeFormat(uint size);
 //测试相关函数
 void printItemList();
 void testHandlers();
+
+// 初始化图片浏览器
+void picViewerInit(Point point, char* fileName);
 
 // 文件项列表相关操作
 void addFileItem(struct stat st, char *name, Rect pos) {
@@ -401,6 +426,7 @@ void addItemEvent(ClickableManager *cm, struct fileItem item) {
 	switch (item.st.type) {
 	case T_FILE:
 		createClickable(cm, item.pos, MSG_LPRESS, h_chooseFile);
+		createClickable(cm, item.pos, MSG_DOUBLECLICK, h_openFile);
 		break;
 	case T_DIR:
 		createClickable(cm, item.pos, MSG_LPRESS, h_chooseFile);
@@ -576,6 +602,26 @@ void h_chooseFile(Point p) {
 	drawFinderContent(context);
 }
 
+void h_openFile(Point p) {
+	struct fileItem *temp = getFileItem(p);
+	char fileName[201];
+	strcpy(fileName, temp->name);
+	int length = strlen(fileName);
+
+	if (length <= 4) {
+		return;
+	}
+
+	// if it is txt file
+	if (fileName[length-4] == '.' && fileName[length-3] == 't' && fileName[length-2] == 'x' && fileName[length-1] == 't') {
+        // do something...
+		textEditor_init(fileName);
+	} else if (fileName[length-4] == '.' && fileName[length-3] == 'b' && fileName[length-2] == 'm' && fileName[length-1] == 'p') {
+		printf(0, "bmp!! %s\n", temp->name);
+		picViewerInit(p, temp->name);
+	}
+}
+
 void h_closeWnd(Point p) {
 	isRun = 0;
 }
@@ -612,6 +658,26 @@ void h_goUp(Point p) {
 
 void h_empty(Point p) {
 
+}
+
+void picViewerInit(Point point, char* fileName)
+{
+    int pid;
+    char* picViewer_argv[] = { "picviewer", fileName };
+
+    printf(1, "init picViewer: starting picViewer\n");
+    pid = fork();
+    if (pid < 0)
+    {
+        printf(1, "init picViewer: fork failed\n");
+        exit();
+    }
+    if (pid == 0)
+    {
+        exec("picviewer", picViewer_argv);
+        printf(1, "init picViewer: exec picViewer failed\n");
+        exit();
+    }
 }
 
 int main(int argc, char *argv[]) {

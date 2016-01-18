@@ -175,10 +175,22 @@ _finder: finder.o $(GUILIB) $(ULIB)
 	$(OBJDUMP) -S $@ > $*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 
+
 _playmusic: playmusic.o $(GUILIB) $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
 	$(OBJDUMP) -S $@ > $*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
+
+_txtEditor_gui: txtEditor_gui.o $(GUILIB) $(ULIB)
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+	$(OBJDUMP) -S $@ > $*.asm
+	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
+
+_picviewer: picviewer.o $(GUILIB) $(ULIB)
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+	$(OBJDUMP) -S $@ > $*.asm
+	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
+
 
 mkfs: mkfs.c fs.h
 	gcc -Werror -Wall -o mkfs mkfs.c
@@ -215,6 +227,8 @@ UPROGS=\
 	_shell_gui\
 	_shell_sh\
 	_finder\
+	_txtEditor_gui\
+	_picviewer\
 	_touch\
 	_uptime\
 	_cp\
@@ -225,7 +239,11 @@ UPROGS=\
 	_cal\
 
 fs.img: mkfs README $(UPROGS)
+<<<<<<< HEAD
 	./mkfs fs.img README $(UPROGS) hankaku.txt HZK16.fnt close.bmp foldericon.bmp play.bmp pause.bmp viewingmode1.bmp viewingmode2.bmp createfile.bmp createfolder.bmp up.bmp gamecenter.bmp folder_icon_big.bmp folder_icon_small.bmp file_icon_big.bmp file_icon_small.bmp bg.bmp music.bmp notes.bmp setting.bmp trash.bmp qian.wav test.wav in.mp3
+=======
+	./mkfs fs.img README $(UPROGS) hankaku.txt cty.txt HZK16.fnt close.bmp foldericon.bmp viewingmode1.bmp viewingmode2.bmp createfile.bmp createfolder.bmp up.bmp gamecenter.bmp folder_icon_big.bmp folder_icon_small.bmp file_icon_big.bmp file_icon_small.bmp bg.bmp music.bmp notes.bmp setting.bmp trash.bmp qian.wav test.wav in.mp3 up1.bmp down.bmp save.bmp
+>>>>>>> b15d036f6b8e0a0bfcdd3d313de2f62cba329710
 
 
 
