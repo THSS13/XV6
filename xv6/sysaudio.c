@@ -146,7 +146,7 @@ sys_waitForDecode(void)
     argint(0, &ptr1);
     argint(1, &ptr2);
     memmove((char*)ptr1, &corebuf.fr_ps, sizeof(struct frame_params));
-    memmove((char*)ptr2, &corebuf.III_side_info, sizeof(struct III_side_info_t));    
+    memmove((char*)ptr2, &corebuf.III_side_info, sizeof(struct III_side_info_t));
     release(&mp3lock.lock);
     return 0;
 }
@@ -162,8 +162,8 @@ sys_beginDecode(void)
     argint(0, &ptr1);
     argint(1, &ptr2);
     memmove(&corebuf.fr_ps, (char*)ptr1, sizeof(struct frame_params));
-    memmove(&corebuf.III_side_info, (char*)ptr2, sizeof(struct III_side_info_t));    
-    
+    memmove(&corebuf.III_side_info, (char*)ptr2, sizeof(struct III_side_info_t));
+
     ismp3decoding = 1;
     wakeup(&mp3lock.nread);
     release(&mp3lock.lock);
