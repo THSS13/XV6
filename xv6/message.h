@@ -24,7 +24,7 @@ typedef struct MsgKey
 	char key;
 } MsgKey;
 
-typedef struct MsgPartialUpdate 
+typedef struct MsgPartialUpdate
 {
     int x1;
     int y1;
@@ -35,6 +35,7 @@ typedef struct MsgPartialUpdate
 typedef struct Msg
 {
 	int msg_type;
+	int msg_detail;
 	union
 	{
 		struct MsgMouse msg_mouse;
@@ -54,5 +55,5 @@ typedef struct MsgTableEntry
 extern void createMsg(int msg_type, int pos_x, int pos_y, char key);
 extern void msgqueueinit();
 extern void msgtableinit();
-extern void createUpdateMsg(int pid);
+extern void createUpdateMsg(int pid, int detail);
 extern void createPartialUpdateMsg(int pid, int x1, int y1, int x2, int y2);

@@ -28,7 +28,7 @@ int uptime(void);
 int getMsg(struct Msg*);
 int createWindow(int, int, int, int);
 int destroyWindow(int);
-int updateWindow(int, unsigned short*);
+int updateWindow(int, unsigned short*, int);
 int updatePartialWindow(int, unsigned short*, int, int, int, int);
 int setSampleRate(int);
 int pause();

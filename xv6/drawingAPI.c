@@ -10,10 +10,10 @@
 *             then do nothing!
 */
 
-void 
+void
 draw_point(struct Context c, unsigned int x, unsigned int y, unsigned short color)
 {
-  if(x >= c.width) 
+  if(x >= c.width)
     return;
   if(y >= c.height)
     return;
@@ -28,7 +28,7 @@ fill_rect(struct Context c, unsigned int bx, unsigned int by, unsigned int width
 {
 	int x, y;
 	int mx = c.width < bx + width ? c.width : bx + width;
-	int my = c.height < by + height ? c.height : by + height; 
+	int my = c.height < by + height ? c.height : by + height;
 	for (y = by; y < my; y++)
 	{
 		for (x = bx; x < mx; x++)
@@ -284,5 +284,3 @@ void draw_iconlist(Context c, ICON* iconlist, int len)
         draw_picture(c, iconlist[i].pic, iconlist[i].position_x, iconlist[i].position_y);
     }
 }
-
-

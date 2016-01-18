@@ -15,6 +15,9 @@ struct MsgTableEntry MsgTable[MAX_PROCESS_NUMBER];
 int mouse_x;
 int mouse_y;
 
+int update_msg = 0;
+#define MAX_UPDATE_MSG 5
+
 void msgqueueinit()
 {
     mouse_x = -1;
@@ -36,7 +39,7 @@ void msgtableinit()
 }
 
 //在MsgQueue中分配一个msg
-int requireMsg(int msg_type, int pos_x, int pos_y, char key)
+int requireMsg(int msg_type, int pos_x, int pos_y, char key, int detail)
 {
 	int i;
 	for(i = 0; i < MAX_QUEUE_LENGTH; i++)
@@ -44,10 +47,16 @@ int requireMsg(int msg_type, int pos_x, int pos_y, char key)
 		if(MsgQueue[i].msg_type == MSG_UNUSED)
 		{
 			MsgQueue[i].msg_type = msg_type;
+      MsgQueue[i].msg_detail = detail;
+      cprintf("msg_type %d, msg detail %d\n", msg_type, detail);
 			if(msg_type == MSG_KEYDOWN)
 			{
 				MsgQueue[i].concrete_msg.msg_key.key = key;
 			}
+      else if (msg_type == MSG_UPDATE && detail == 4)
+      {
+        update_msg++;
+      }
 			else
 			{
 				MsgQueue[i].concrete_msg.msg_mouse.x = pos_x;
@@ -86,9 +95,26 @@ void dispatch(int pid, int msg_index)
 		if(MsgTable[i].pid == pid)
 		{
 			int temp_msg_index = MsgTable[i].first_msg;
+      int temp2_msg_index = 0;
+      if (update_msg > MAX_UPDATE_MSG){
+        if (MsgQueue[temp_msg_index].msg_type == MSG_UPDATE && MsgQueue[temp_msg_index].msg_detail == 4){
+          MsgQueue[temp_msg_index].msg_type = MSG_UNUSED;
+          MsgTable[i].first_msg = MsgQueue[temp_msg_index].next_msg;
+          update_msg--;
+        }
+      }
 			while(MsgQueue[temp_msg_index].next_msg != -1)
 			{
-				temp_msg_index = MsgQueue[temp_msg_index].next_msg;
+				temp2_msg_index = MsgQueue[temp_msg_index].next_msg;
+        if (update_msg > MAX_UPDATE_MSG){
+          if (MsgQueue[temp2_msg_index].msg_type == MSG_UPDATE && MsgQueue[temp2_msg_index].msg_detail == 4){
+            MsgQueue[temp2_msg_index].msg_type = MSG_UNUSED;
+            MsgQueue[temp_msg_index].next_msg = MsgQueue[temp2_msg_index].next_msg;
+            temp2_msg_index = MsgQueue[temp2_msg_index].next_msg;
+            update_msg--;
+          }
+        }
+        temp_msg_index = temp2_msg_index;
 			}
 			MsgQueue[temp_msg_index].next_msg = msg_index;
 			MsgQueue[msg_index].next_msg = -1;
@@ -113,15 +139,15 @@ void createMsg(int msg_type, int pos_x, int pos_y, char key)
     int x = pos_x;
     int y = pos_y;
     //if(msg_type != 0) cprintf("msg type: %d\n", msg_type);
-    /*if(msg_type == MSG_LPRESS || msg_type == MSG_RPRESS || msg_type == MSG_DOUBLECLICK 
-        || msg_type == MSG_KEYDOWN || msg_type == MSG_DRAG) 
+    /*if(msg_type == MSG_LPRESS || msg_type == MSG_RPRESS || msg_type == MSG_DOUBLECLICK
+        || msg_type == MSG_KEYDOWN || msg_type == MSG_DRAG)
         cprintf("msg type: %d\n", msg_type);*/
 	int pid;
     int msg_index;
 	if(msg_type == MSG_KEYDOWN)//键盘事件
 	{
 		pid = getActivated()->pid;
-        msg_index = requireMsg(msg_type, x, y, key);
+        msg_index = requireMsg(msg_type, x, y, key, 0);
 	    if (msg_index == -1) return;
         dispatch(pid, msg_index);
 	}
@@ -139,15 +165,17 @@ void createMsg(int msg_type, int pos_x, int pos_y, char key)
 
         if(msg_type == MSG_LPRESS || msg_type == MSG_RPRESS || msg_type == MSG_DOUBLECLICK)
         {
-            setActivated(win_ptr);
-            msg_index = requireMsg(msg_type, x, y, key);
+            if (win_ptr->next_window != 0)
+                setActivated(win_ptr);
+            msg_index = requireMsg(msg_type, x, y, key, 0);
 	        if (msg_index == -1) return;
             dispatch(pid, msg_index);
         }
-        
+
         if(msg_type == MSG_DRAG)
         {
-            setActivated(win_ptr);
+            if (win_ptr->next_window != 0)
+              setActivated(win_ptr);
         	if(win_ptr->prior_window == 0)//desktop
             {
                 mouse_x = pos_x;
@@ -155,10 +183,10 @@ void createMsg(int msg_type, int pos_x, int pos_y, char key)
 		        drawMouse(pos_x, pos_y);
              	return;
             }
-            
+
             int dx = pos_x - mouse_x;
             int dy = pos_y - mouse_y;
-            
+
             int win_left_x = win_ptr->window_position.left_x;
             int win_left_y = win_ptr->window_position.left_y;
             int win_right_x = win_ptr->window_position.right_x;
@@ -175,10 +203,10 @@ void createMsg(int msg_type, int pos_x, int pos_y, char key)
                 return;
             }*/
             if(win_left_x + dx >= 0 && win_left_y + dy >= 0
-                && win_right_x + dx < SCREEN_WIDTH 
+                && win_right_x + dx < SCREEN_WIDTH
                 && win_right_y + dy < SCREEN_HEIGHT)//判断合法位移
             {
-                win_ptr->window_position.left_x += dx;           
+                win_ptr->window_position.left_x += dx;
                 win_ptr->window_position.left_y += dy;
                 win_ptr->window_position.right_x += dx;
                 win_ptr->window_position.right_y += dy;
@@ -190,7 +218,7 @@ void createMsg(int msg_type, int pos_x, int pos_y, char key)
 		        drawMouse(pos_x, pos_y);
                 return;
             }
-            /*msg_index = requireMsg(msg_type, x, y, key);
+            /*
 	        if (msg_index == -1) return;*/
             //dispatch(pid, msg_index);
             cprintf("update area: x1: %d, y1: %d, x2: %d, y2:%d.\n", x1, y1, x2, y2);
@@ -201,18 +229,18 @@ void createMsg(int msg_type, int pos_x, int pos_y, char key)
             setMouse(mouse_x, mouse_y);
             return;
         }
-        
+
         mouse_x = pos_x;
         mouse_y = pos_y;
 		drawMouse(pos_x, pos_y);
 	}
 }
 
-void createUpdateMsg(int pid)
+void createUpdateMsg(int pid, int detail)
 {
-	int msg_index = requireMsg(MSG_UPDATE, 0, 0, ' ');
+	int msg_index = requireMsg(MSG_UPDATE, 0, 0, ' ', detail);
 	if (msg_index == -1) return;
-	
+
 	dispatch(pid, msg_index);
 }
 
@@ -220,7 +248,7 @@ void createPartialUpdateMsg(int pid, int x1, int y1, int x2, int y2)
 {
     int msg_index = requirePartialUpdateMsg(x1, y1, x2, y2);
     if (msg_index == -1) return;
-	
+
 	dispatch(pid, msg_index);
 }
 
@@ -234,6 +262,7 @@ void getMsg(int pid, struct Msg* ptr)
 		{
 			int msg_index = MsgTable[i].first_msg;
 			ptr->msg_type = MsgQueue[msg_index].msg_type;
+      ptr->msg_detail = MsgQueue[msg_index].msg_detail;
 			ptr->concrete_msg = MsgQueue[msg_index].concrete_msg;
 			if(MsgQueue[msg_index].next_msg == -1)
 			{

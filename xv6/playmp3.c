@@ -18,10 +18,11 @@ int main(int argc, char**argv)
 	if (mp3pid == 0) {
 //		exec("decode", argv);
 	}
+	printf(0, "start playing mp3\n");
 	setSampleRate(44100);
 	Bit_stream_struc  bs;
 	struct frame_params fr_ps;
-	struct III_side_info_t III_side_info; 
+	struct III_side_info_t III_side_info;
 	unsigned int old_crc;
 	layer info;
 	unsigned long bitsPerSlot;
@@ -33,7 +34,7 @@ int main(int argc, char**argv)
 
 	fr_ps.header = &info;
 
-        open_bit_stream_r(&bs, "in.mp3", BUFFER_SIZE);
+    open_bit_stream_r(&bs, argv[1], BUFFER_SIZE);
 	int frame_Num = 0;
 	while(!end_bs(&bs)) {
 		//³¢ÊÔÖ¡Í¬²œ
@@ -54,7 +55,7 @@ int main(int argc, char**argv)
 			static int frame_start = 0;
 
 			bitsPerSlot = 8;
-			
+
 			//È¡SideÐÅÏ¢
 			III_get_side_info(&bs, &(III_side_info), &(fr_ps));
 			nSlots = main_data_slots(fr_ps);
@@ -75,7 +76,7 @@ int main(int argc, char**argv)
 //			printf(0, "discard : %d\n", bytes_to_discard);
 			if (bytes_to_discard < 0) {
 				printf(0, "discard: %d %d %d\n", frame_start, main_data_end, III_side_info.main_data_begin);
-				//printf(0, "Not enough main data to decode frame %d.  Frame discarded.\n",frame_Num - 1); 
+				//printf(0, "Not enough main data to decode frame %d.  Frame discarded.\n",frame_Num - 1);
 				break;
 			}
 			for (; bytes_to_discard > 0; bytes_to_discard--) hgetbits(8);

@@ -149,11 +149,11 @@ mouseintr(uint tick)
 	}
 
 	event = 0;
-	int win_left_y = 0;
+	/*int win_left_y = 0;
 	struct Window* win_ptr = getWindowByPoint(x_position, y_position);
 	if(win_ptr != 0) {
 		win_left_y = win_ptr->window_position.left_y;
-	}
+	}*/
 	
 	if(left_already_down == 0 && right_already_down == 0)
 	{
@@ -198,10 +198,10 @@ mouseintr(uint tick)
 		}
 		else
 		{
-			if(y_position < win_left_y + TOPBAR_HEIGHT){
+			//if(y_position < win_left_y + TOPBAR_HEIGHT){
 				event = DRAGGING;
 			    is_dragging = 1;
-			}
+			//}
 		}
 	}
 
@@ -329,7 +329,7 @@ mouseintr(uint tick)
 	// 			dragging_count = (dragging_count + 1) % 5;
 	// 			if(dragging_count != 0)
 	// 				return;
-	// 			if(x_drag_window + (x_position - x_drag_start) < 0 || 
+	// 			if(x_drag_window + (x_position - x_drag_start) < 0 ||
 	// 				x_drag_window + (x_position - x_drag_start) + WindowWidth > SCREEN_WIDTH ||
 	// 				y_drag_window + (y_position - y_drag_start) < 0 ||
 	// 				y_drag_window + (y_position - y_drag_start) + WindowHeight > SCREEN_HEIGHT)
