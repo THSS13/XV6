@@ -60,17 +60,17 @@ void playmusic(Point point)
 {
     int pid;
     char* argv[] = { "playmusic", "qian.wav" , "test.wav", "in.mp3"};
-    printf(0, "start playing music \n");
+    printf(0, "init player: starting player \n");
     pid = fork();
     if (pid < 0)
     {
-        printf(1, "init play: fork failed\n");
+        printf(1, "init player: fork failed\n");
         exit();
     }
     if (pid == 0)
     {
         exec("playmusic", argv);
-        printf(1, "init play: exec play failed\n");
+        printf(1, "init player: exec play failed\n");
         exit();
     }
 }

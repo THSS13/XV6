@@ -378,24 +378,32 @@ void h_chooseFile(Point p) {
 void h_playMusic(Point p) {
 	int pid;
 	struct fileItem *fi = getFileItem(p);
-	char* argv[] = { "play", fi->name };
-	if (fi->name[strlen(fi->name) - 1] == '3')
-    	strcpy(argv[0], "playmp3");
+	char* argv1[] = { "play", fi->name };
+	char* argv2[] = { "playmp3", fi->name};
     printf(0, "start playing music \n");
     pid = fork();
 	if (pid > 0) playid = pid;
     if (pid < 0)
     {
-        printf(1, "init playwav: fork failed\n");
+        printf(1, "init playmusic: fork failed\n");
         exit();
     }
     if (pid == 0)
     {
-		if (fi->name[strlen(fi->name) - 1] == '3')
-			exec("playmp3", argv);
-		else
-        	exec("play", argv);
-        printf(1, "init playwav: exec play failed\n");
+		if (fi->name[strlen(fi->name) - 1] == '3') {
+			if (playid) {
+				kill(playid);
+				playid = -1;
+			}
+			exec("playmp3", argv2);
+		} else {
+			if (playid) {
+				kill(playid);
+				playid = -1;
+			}
+        	exec("play", argv1);
+		}
+		printf(1, "init playmusic: exec play failed\n");
         exit();
     }
 }
@@ -404,7 +412,7 @@ void h_pauseMusic(Point p) {
 	if (isPaused) {
 		strcpy(wndRes[1].name, "pause.bmp");
 		isPaused = 0;
-  } else {
+  	} else {
 		strcpy(wndRes[1].name, "play.bmp");
 		printf(1, "%s\n", wndRes[1].name);
 		isPaused = 1;
@@ -485,7 +493,6 @@ main(int argc, char *argv[])
 		case MSG_LPRESS:
 			p = initPoint(msg.concrete_msg.msg_mouse.x,
 					msg.concrete_msg.msg_mouse.y);
-			printf(1, "%d, %d\n", p.x, p.y);
 			if (executeHandler(cm.left_click, p)) {
 				updateWindow(winid, context.addr, msg.msg_detail);
 			}
