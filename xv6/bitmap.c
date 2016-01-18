@@ -171,4 +171,3 @@ void set_icon_alpha(PICNODE *pic) {
 		}
 	}
 }
-
