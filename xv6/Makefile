@@ -239,11 +239,8 @@ UPROGS=\
 	_cal\
 
 fs.img: mkfs README $(UPROGS)
-<<<<<<< HEAD
-	./mkfs fs.img README $(UPROGS) hankaku.txt HZK16.fnt close.bmp foldericon.bmp play.bmp pause.bmp viewingmode1.bmp viewingmode2.bmp createfile.bmp createfolder.bmp up.bmp gamecenter.bmp folder_icon_big.bmp folder_icon_small.bmp file_icon_big.bmp file_icon_small.bmp bg.bmp music.bmp notes.bmp setting.bmp trash.bmp qian.wav test.wav in.mp3
-=======
-	./mkfs fs.img README $(UPROGS) hankaku.txt cty.txt HZK16.fnt close.bmp foldericon.bmp viewingmode1.bmp viewingmode2.bmp createfile.bmp createfolder.bmp up.bmp gamecenter.bmp folder_icon_big.bmp folder_icon_small.bmp file_icon_big.bmp file_icon_small.bmp bg.bmp music.bmp notes.bmp setting.bmp trash.bmp qian.wav test.wav in.mp3 up1.bmp down.bmp save.bmp
->>>>>>> b15d036f6b8e0a0bfcdd3d313de2f62cba329710
+	./mkfs fs.img README $(UPROGS) hankaku.txt cty.txt HZK16.fnt close.bmp foldericon.bmp play.bmp pause.bmp viewingmode1.bmp viewingmode2.bmp createfile.bmp createfolder.bmp up.bmp gamecenter.bmp folder_icon_big.bmp folder_icon_small.bmp file_icon_big.bmp file_icon_small.bmp bg.bmp music.bmp notes.bmp setting.bmp trash.bmp qian.wav test.wav in.mp3 up1.bmp down.bmp save.bmp
+
 
 
 
