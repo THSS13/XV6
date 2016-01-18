@@ -13,6 +13,7 @@
 #include "mmu.h"
 #include "proc.h"
 #include "x86.h"
+#include "execvim.h"
 
 //yi xia shi hou jia de
 #define COMMANDMAXLENDTH 10//命令的最长长度
@@ -376,11 +377,197 @@ consputc(int c)
 }
 
 #define C(x)  ((x)-'@')  // Control-x
+int firstvim = 1;
+int startpos;
+int endpos;
 
 void
 consoleintr(int (*getc)(void), int type)
 {
   int c;
+  // 执行vim操作的键盘相应
+  if(execvim == 1){
+    acquire(&input.lock);
+    while((c = getc()) >= 0){
+      int pos;
+      if(c != 0){
+        // Cursor position: col + 80*row.
+        outb(CRTPORT, 14);
+        pos = inb(CRTPORT+1) << 8;
+        outb(CRTPORT, 15);
+        pos |= inb(CRTPORT+1);
+        // 找到文件头位置及尾位置
+        if(firstvim){
+          endpos = pos;
+          if(endpos % 80 != 0)
+            endpos = pos + 80 - pos%80;
+          for(startpos = pos - pos%80; startpos >= 0 && (crt[startpos] != (('$'&0xff) | 0x0700)
+           || crt[startpos+1] != ((' '&0xff) | 0x0700) || crt[startpos+2] != (('v'&0xff) | 0x0700)
+            || crt[startpos+3] != (('i'&0xff) | 0x0700) || crt[startpos+4] != (('m'&0xff) | 0x0700)
+             || crt[startpos+5] != ((' '&0xff) | 0x0700)); startpos--);
+          if(startpos < 0)
+            startpos = 0;
+          else
+            startpos += 80 - startpos%80;
+          if(startpos == endpos){
+            int i;
+            for(i = startpos; i < startpos + 80; i++)
+              crt[i] = (' '&0xff) | 0x0700;
+            endpos += 80;
+          }
+          firstvim = 0;
+          pos = startpos;
+        }
+      }
+      // 若用户不点击Esc键
+      if(c != 0x1B && c != 0){
+        // 上下左右键盘相应
+        if(c == 0xe2){
+          if(pos >= startpos + 80)
+            pos -= 80;
+        }
+        else if(c == 0xe3){
+          if(pos < endpos - 80)
+            pos += 80;
+        }
+        else if(c == 0xe4){
+          if(pos > startpos)
+            pos--;
+        }
+        else if(c == 0xe5){
+          if(pos < endpos - 1)
+            pos++;
+        }
+        // 回车键盘相应
+        else if(c == '\n'){
+          if(endpos == 23*80){
+            memmove(crt, crt+80, sizeof(crt[0])*(pos/80)*80);
+            int i;
+            for(i = (pos/80)*80; i < (pos/80)*80 + 80; i++)
+              crt[i] = (' '&0xff) | 0x0700;
+            startpos -= 80;
+          }
+          else{
+            pos += 80 - pos%80;
+            memmove(crt+pos+80, crt+pos, sizeof(crt[0])*(endpos-pos));
+            int i;
+            for(i = pos; i < pos + 80; i++)
+              crt[i] = (' '&0xff) | 0x0700;
+            endpos += 80;
+          }
+          pos -= pos%80;
+        }
+        // 退格键盘相应
+        else if(c == C('H')){
+          if(pos > startpos){
+            int i;
+            int rmline = 1;
+            for(i = pos; i < pos+80 && pos%80 == 0; i++){
+              if(crt[pos] != ((' '&0xff) | 0x0700)){
+                rmline = 0;
+                break;
+              }
+            }
+            if(crt[pos] == ((' '&0xff) | 0x0700) && pos%80 == 0 && rmline){
+              memmove(crt+pos, crt+pos+80, sizeof(crt[0])*(endpos-pos-80));
+              for(i = endpos - 80; i < endpos; i++)
+                crt[i] = (' '&0xff) | 0x0700;
+              endpos -= 80;
+              while(crt[--pos] == ((' '&0xff) | 0x0700) && pos%80 != 0);
+              if(crt[pos] != ((' '&0xff) | 0x0700))
+                pos++;
+            }
+            else{
+              crt[--pos] = (' '&0xff) | 0x0700;
+              for(i = pos; i < endpos; i++){
+                if(i%80 == 79 && crt[i] == ((' '&0xff) | 0x0700))
+                  break;
+                crt[i] = crt[i+1];
+              }
+              if(pos%80 == 79){
+                while(crt[--pos] == ((' '&0xff) | 0x0700) && pos%80 != 0);
+                if(pos % 80 == 0 && crt[pos] == ((' '&0xff) | 0x0700)){
+                  memmove(crt+pos, crt+pos+80, sizeof(crt[0])*(endpos-pos-80));
+                  for(i = endpos - 80; i < endpos; i++)
+                    crt[i] = (' '&0xff) | 0x0700;
+                  endpos -= 80;
+                }
+                else
+                  pos++;
+              }
+            }
+          }
+        }
+        // 输入字符
+        else{
+          int i = pos + 79 - pos%80;
+          while(crt[i] != ((' '&0xff) | 0x0700))
+            i += 80;
+          if(i < endpos){
+            for( ; i > pos; i--)
+              crt[i] = crt[i-1];
+          }
+          else{
+            i = pos + 80 - pos%80;
+            memmove(crt+i+80, crt+i, sizeof(crt[0])*(endpos-i));
+            int j;
+            for(j = i; j < i + 80; j++)
+              crt[j] = (' '&0xff) | 0x0700;
+            for( ; i > pos; i--)
+              crt[i] = crt[i-1];
+            endpos += 80;
+          }
+          crt[pos++] = (c&0xff) | 0x0700;
+        }
+        if((endpos/80) >= 24){  // Scroll up.
+          memmove(crt, crt+80, sizeof(crt[0])*23*80);
+          startpos -= 80;
+          endpos -= 80;
+          pos -= 80;
+          int i;
+          for(i = endpos; i < endpos + 80; i++)
+            crt[i] = (' '&0xff) | 0x0700;
+        }
+        
+        outb(CRTPORT, 14);
+        outb(CRTPORT+1, pos>>8);
+        outb(CRTPORT, 15);
+        outb(CRTPORT+1, pos);
+      }
+      // 若用户键入Esc，则退出vim
+      else if(c != 0){
+        execvim = 0;
+        firstvim = 1;
+        int i, j;
+        memset(content, 0, sizeof(char)*2000);
+        for(i = startpos, j = 0; i < endpos; i++){
+          if(crt[i] != ((' '&0xff) | 0x0700)){
+            content[j++] = crt[i] & 0x00ff;
+          }
+          else{
+            int k;
+            for(k = i+1; (k%80) != 0 && crt[k] == ((' '&0xff) | 0x0700); k++);
+            if(k%80 == 0){
+              content[j++] = '\n';
+              i = k - 1;
+            }
+            else{
+              for(; crt[i] == ((' '&0xff) | 0x0700); i++)
+                content[j++] = ' ';
+              i--;
+            }
+          }
+        }
+        content[j++] = 0;
+        outb(CRTPORT, 14);
+        outb(CRTPORT+1, endpos>>8);
+        outb(CRTPORT, 15);
+        outb(CRTPORT+1, endpos);
+      }
+    }
+    release(&input.lock);
+    return;
+  }
 
   acquire(&input.lock);
 	iskbdtype = type;

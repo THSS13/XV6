@@ -111,6 +111,8 @@ extern int sys_waitForDecode(void);
 extern int sys_beginDecode(void);
 extern int sys_endDecode(void);
 extern int sys_getCoreBuf(void);
+extern int sys_halt(void);
+extern int sys_reboot(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -147,6 +149,8 @@ static int (*syscalls[])(void) = {
 [SYS_waitForDecode] sys_waitForDecode,
 [SYS_endDecode] sys_endDecode,
 [SYS_getCoreBuf] sys_getCoreBuf,
+[SYS_halt]    sys_halt,
+[SYS_reboot]  sys_reboot,
 };
 
 void
