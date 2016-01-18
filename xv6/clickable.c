@@ -3,6 +3,7 @@
 #include "message.h"
 #include "types.h"
 #include "user.h"
+#include "finder.h"
 Point initPoint(int x, int y)
 {
 	Point p;
@@ -115,10 +116,17 @@ int executeHandler(Clickable *head, Point click)
 	{
 		if (isIn(click, cur->area))
 		{
+			renaming = 0;
+			isSearching = 0;
 			cur->handler(click);
 			return 1;
 		}
 		cur = cur->next;
+	}
+	isSearching = 0;
+	if (renaming == 1){
+		renaming = 0;
+		return 1;
 	}
 	printf(0, "execute: none!\n");
 	return 0;
