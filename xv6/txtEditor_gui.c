@@ -421,7 +421,7 @@ int main(int argc, char *argv[]) {
 			p = initPoint(msg.concrete_msg.msg_mouse.x,
 					msg.concrete_msg.msg_mouse.y);
 			if (executeHandler(cm.double_click, p)) {
-				updateWindow(winid, context.addr);
+				updateWindow(winid, context.addr, msg.msg_detail);
 			}
 			break;
 		case MSG_UPDATE:
@@ -430,7 +430,7 @@ int main(int argc, char *argv[]) {
             printf(1,"fileEditor: window displayed!\r\n");
             createAllPages();
             printf(1,"fileEditor: text displayed!\r\n");
-			updateWindow(winid, context.addr);
+			updateWindow(winid, context.addr, msg.msg_detail);
 			break;
 		case MSG_PARTIAL_UPDATE:
 			updatePartialWindow(winid, context.addr,
@@ -442,7 +442,7 @@ int main(int argc, char *argv[]) {
 		case MSG_KEYDOWN:
 			write_cmd_ch = msg.concrete_msg.msg_key.key;
 			handle_keydown(context, write_cmd_ch);
-			updateWindow(winid, context.addr);
+			updateWindow(winid, context.addr, msg.msg_detail);
 			break;
 		case MSG_LPRESS:
 			//printf(0, "left click event!\n");
@@ -450,7 +450,7 @@ int main(int argc, char *argv[]) {
 					msg.concrete_msg.msg_mouse.y);
 
 			if (executeHandler(cm.left_click, p)) {
-                updateWindow(winid, context.addr);
+                updateWindow(winid, context.addr, msg.msg_detail);
 
 			}
             moveCursor(msg.concrete_msg.msg_mouse.x,
@@ -461,7 +461,7 @@ int main(int argc, char *argv[]) {
 			p = initPoint(msg.concrete_msg.msg_mouse.x,
 					msg.concrete_msg.msg_mouse.y);
 			if (executeHandler(cm.right_click, p)) {
-				updateWindow(winid, context.addr);
+				updateWindow(winid, context.addr, msg.msg_detail);
 			}
 			break;
 		default:

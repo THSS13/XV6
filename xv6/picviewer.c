@@ -178,13 +178,13 @@ int main(int argc, char *argv[]) {
 			p = initPoint(msg.concrete_msg.msg_mouse.x,
 					msg.concrete_msg.msg_mouse.y);
 			if (executeHandler(cm.double_click, p)) {
-				updateWindow(winid, context.addr);
+				updateWindow(winid, context.addr, msg.msg_detail);
 			}
 			break;
 		case MSG_UPDATE:
 			drawPicViewerWnd(context);
 			drawPicViewerContent(context, argv[1]);
-			updateWindow(winid, context.addr);
+			updateWindow(winid, context.addr, msg.msg_detail);
 			break;
 		case MSG_PARTIAL_UPDATE:
 			updatePartialWindow(winid, context.addr,
@@ -198,14 +198,14 @@ int main(int argc, char *argv[]) {
 					msg.concrete_msg.msg_mouse.y);
 			if (executeHandler(cm.left_click, p)) {
 
-				updateWindow(winid, context.addr);
+				updateWindow(winid, context.addr, msg.msg_detail);
 			}
 			break;
 		case MSG_RPRESS:
 			p = initPoint(msg.concrete_msg.msg_mouse.x,
 					msg.concrete_msg.msg_mouse.y);
 			if (executeHandler(cm.right_click, p)) {
-				updateWindow(winid, context.addr);
+				updateWindow(winid, context.addr, msg.msg_detail);
 			}
 			break;
 		default:
