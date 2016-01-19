@@ -729,7 +729,7 @@ void scrollDown() {
 	// 	p = q;
 	// 	q = q->next;
 	// }
-	printf(0, "have you ever had sex?%d\n%d", fileItemList->pos.start.y, (WINDOW_HEIGHT - LIST_ITEM_HEIGHT));
+	//printf(0, "have you ever had sex?%d\n%d", fileItemList->pos.start.y, (WINDOW_HEIGHT - LIST_ITEM_HEIGHT));
 	if (style == ICON_STYLE){
 		if(q->pos.start.y > (WINDOW_HEIGHT - ICON_ITEM_HEIGHT)){
 			if(q->pos.start.y > WINDOW_HEIGHT){
@@ -773,8 +773,8 @@ void scrollUp() {
 		p = q;
 		q = q->next;
 	}
-	printf(0, "the first file's y is tmd:%d\n", p->pos.start.y);
-	printf(0, "have you ever had sex?%d\n", fileItemList->pos.start.y);
+	//printf(0, "the first file's y is tmd:%d\n", p->pos.start.y);
+	//printf(0, "have you ever had sex?%d\n", fileItemList->pos.start.y);
 	if (style == ICON_STYLE){
 		if(p->pos.start.y < (TOPBAR_HEIGHT + TOOLSBAR_HEIGHT)){
 			if(p->pos.start.y < (TOPBAR_HEIGHT + TOOLSBAR_HEIGHT - ICON_ITEM_HEIGHT)){
@@ -936,7 +936,7 @@ void h_newFolder(Point p) {
 
 void deleteFile(char *name)
 {
-	printf(0, "currently having sex with %s\n", name);
+	//printf(0, "currently having sex with %s\n", name);
 	if(unlink(name) < 0){
 		if (chdir(name) < 0){
 			printf(2, "rm: %s failed to delete\n", name);
