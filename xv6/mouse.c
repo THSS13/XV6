@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "mouse.h"
 #include "window.h"
+#include "windowStyle.h" //get TOPBAR_HEIGHT
 #include "message.h"
 
 static struct spinlock mouse_lock;
@@ -148,7 +149,12 @@ mouseintr(uint tick)
 	}
 
 	event = 0;
-
+	/*int win_left_y = 0;
+	struct Window* win_ptr = getWindowByPoint(x_position, y_position);
+	if(win_ptr != 0) {
+		win_left_y = win_ptr->window_position.left_y;
+	}*/
+	
 	if(left_already_down == 0 && right_already_down == 0)
 	{
 		if(left_down == 1)
@@ -192,8 +198,10 @@ mouseintr(uint tick)
 		}
 		else
 		{
-			event = DRAGGING;
-			is_dragging = 1;
+			//if(y_position < win_left_y + TOPBAR_HEIGHT){
+				event = DRAGGING;
+			    is_dragging = 1;
+			//}
 		}
 	}
 
