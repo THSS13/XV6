@@ -13,9 +13,10 @@
 
 #define MAXARGS 10
 
-#define COMMANDNUM 22
+#define COMMANDNUM 25
 char *command[COMMANDNUM] = { "cat", "cd", "cp", "echo", "forktest", "grep", "init", "kill", "ln", "ls",
-"mkdir", "ren", "rm", "splice", "sh", "stressfs", "usertests", "editor", "wc", "zombie", "cal" };
+"mkdir", "ren", "rm", "splice", "sh", "stressfs", "usertests", "editor", "wc", "zombie", "cal",
+"shutdown", "reboot", "clear", "vim" };
 
 struct cmd {
   int type;
